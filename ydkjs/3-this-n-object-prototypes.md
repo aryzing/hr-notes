@@ -1,19 +1,20 @@
 # `this` & Object Prototypes
 ## `this` or That?
 * The `this` mechanism provides a cleaner way of "passing along" an object.
-Function declarations add function name to the current scope, so no issue calling the function from within itself because even if itself was not part of own lexical scope, it would fall back to the enclosing scope which contains a reference to it. However, since named function expressions are able to reference themselves within thier scope, I am assuming that the name of the function gets added to both the scope where it is defined *and* the scope it creates.
+
+Function declarations add function name to the current scope, so no issue calling the function from within itself because even if itself was not part of own lexical scope, it would fall back to the enclosing scope which contains a reference to it. However, since named function expressions are able to reference themselves within their scope, I am assuming that the name of the function gets added to both the scope where it is defined *and* the scope it creates.
 
 ## `this` All Makes Sense Now
 * `this` is a binding dependant on its function's **call-site**.
 * Four cases for binding: **Default**, **Implicit**, **Explicit**, **`new`**.
-* If a primitive type is passed in explicit binding, it will be boxed: `new String()`, `new Boolean()`, `new Number`.
-* **Hard Binding** is a pattern where the desired binding is explicitly set within the scope of another function which, which can then be used elsewhere. If a framework changes the `this` of the outer function, the explicit binding within it will remain.
+* If a primitive type is passed in explicit binding, it will be boxed: `new String()`, `new Boolean()`, `new Number()`.
+* **Hard Binding** is a pattern where the desired binding is explicitly set within the scope of another function, which can then be used elsewhere. If a framework changes the `this` of the outer function, the explicit binding within it will remain.
 ```js
 // simple `bind` helper
 function bind(fn, obj) {
-  return function() {
-    return fn.apply(obj, arguments);
-  }
+    return function() {
+      return fn.apply(obj, arguments);
+    };
 }
 ```
 * Hard binding so common that ES5 introduced `Function.prototype.bind` which does what the snippet above does:
@@ -21,8 +22,8 @@ function bind(fn, obj) {
 var b = myFunc.bind(objToBindTo);
 console.log(b.name) // "bound myFunc". Will show up in stack trace
 ```
-* In JS, constructors are just functins that happen to be called with `new`.
-* `new` steps: brand new object created, its prototype linked to the function, bound to this of the function, new experession evaluated to the object unless function returns a different object.
+* In JS, constructors are just functions that happen to be called with `new`.
+* `new` steps: brand new object created, its prototype linked to the object `theFunc.prototype`, `this` is bound to newly created object, `new` experession evaluated to the newly created object unless the function returns a different object.
 * Creation of totally empty object to assign to `this` during explicit binding call: `Object.create(null)`.
 * Useful for calling functions with `apply` with array of arguments (esp. functions you don't control) b/c with null/undefined could get bound to global if non strict mode.
 * ES6 `func(...[a,b,c]);`
@@ -87,3 +88,9 @@ ob1.isPrototypeOf(ob2);
 * Basically `instanceof` of is a particular case of `isPrototypeOf` that assumes that one of the objects is the `prototype` property of the supplied function.
 * To access an object's prototype: `Object.getPrototypeOf(ob);`.
 * If you dont want to jump through function prototype hoops, just use `Object.create(..);`.
+
+## Behavior Delegation
+* The important functionality to leverage in JavaScript is all about objects being linked to other objects.
+* It is good practice to not rely on links as fallbacks: hard to maintain code. Better to make a property that calls the fallback method to explicitly state that we are relying on prototype linkage as a fallback.
+* Circular linkage references are disallowed.
+* When coding with OLOO (Objects Linked to Other Objects) style, the *who* "constructed" any given object is an irrelevant detail.

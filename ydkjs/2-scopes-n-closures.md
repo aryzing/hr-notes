@@ -33,7 +33,7 @@
 * Variable declarations are hoisted, and declaration plus assignment statements are treated as two independant statements.
 * Function declarations are hoisted, but function expressions are not.
 * Function expression names are not available to the scope.
-* Function declarations names have priorit over `var` declarations with same name.
+* Function declarations names have priority over `var` declarations with same name.
 * While subsequent `var` declarations with same name are ignored, subsequent function declarations with same name override previous function declarations.
 What truly surprised me from this chapter is that named function expressions are not hoisted, and they can not be referenced by name anywhere in the scope. I guess that being named solves recursion problems. While names of declared functions can be used anywhere in the scope, names of variables that are assigned a function expression can only be run after the line where the assignment occurs, or else they contain `undefined`.
 * Is there any reason other than recursion to name a function expression?

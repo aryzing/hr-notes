@@ -22,7 +22,7 @@
 * Note, `typeof null` is `"object"`.
 * Arrays and functions are object subtypes.
 * `typeof myArray` returns `"object"`, yet `typeof myFunc` returns `"function"`.
-* It appears that methods and properties can be called on methods: a *native* aka *object wrapper* pairs with a primitive type.
+* Methods and properties can be called on primitives because a *native* aka *object wrapper* pairs with a primitive type.
 * When calling methods on primitives, these are automatially boxed in their object wrapper counterpart.
 * Common wrappers: `string -> String`, `number -> Number`, `boolean -> Boolean`.
 * Value comparisons, mainly *equality* and *inequality* always yield boolean value regardless of the type of the values compared.
@@ -35,20 +35,19 @@
 * Coercion rules http://www.ecma-international.org/ecma-262/5.1/.
 * Use `var` keyword to declare variable that will belong to current function scope, or global scope if at top level outside any function.
 * *Hoisting*: a `var` declaration is conceptually taken to the top of the enclosing scope.
-* *Is it possible that a variable is only hoisted if no assignment is made?*
-* Hoisting also works with functions.
-* *Not sure how `var a = function() {};` works*.
-* Strict mode is good, brings improvements and compiler optimizations. `"use strict;"`.
+* Hoisting occurs regardless of whether a variable is assigned a value.
+* `function` declarations are also hoisted.
+* Strict mode is good, brings improvements and compiler optimizations. `'use strict';`.
 * A function is just like any other value.
 * *IIFE*: Immediately Invoked Function Expression
 * IIFEs are commonly used to create new scopes.
-* In strict mode, a function containing `this` not called as a methods will assign undefined to `this`.
+* In strict mode, a function containing `this` not called as a method will assign undefined to `this`.
 * A *module* is a code pattern that takes advantage of closures: define private implementation details and a public API.
-* *Alternative do module an object with private/public properites?*
-* Four ways of using `this`: global (not in strict mode), `.` operator, `call`, `new`.
+* *Alternative to module an object with private/public properites?*
+* Four ways of using `this`: global (not in strict mode), `.` operator, `call`/`apply`, and `new`.
 * When you reference a property on an object, if that property doesn't exist, JavaScript will automatically use that object's internal prototype reference to find another object to look for the property on.
 * The internal prototype reference linkage from one object to its fallback happens at the time the object is created. (Automatic/implicit linkage).
-* Explicit linkage: `var b = Object.create(a)`. If a property does not exist on `b`, it will be searched for in `a`.
+* Explicit linkage: `var b = Object.create(a);`. If a property does not exist on `b`, it will be searched for in `a`.
 * ES6: Provides `Number.isNaN()` to reliably check for `NaN`.
 * Host object: an object provided by the environment that is not actually a JS object, but behaves like one. Example: `document` in browsers.
 * `NaN` is only value in whole language not equal to itself.
