@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="utf-8" />
+      <title>3-this-n-object-prototypes</title>
+      <style>.markdown-preview:not([data-use-github-style]) { padding: 2em; font-size: 1.2em; color: rgb(56, 58, 66); overflow: auto; background-color: rgb(250, 250, 250); }
+.markdown-preview:not([data-use-github-style]) > :first-child { margin-top: 0px; }
+.markdown-preview:not([data-use-github-style]) h1, .markdown-preview:not([data-use-github-style]) h2, .markdown-preview:not([data-use-github-style]) h3, .markdown-preview:not([data-use-github-style]) h4, .markdown-preview:not([data-use-github-style]) h5, .markdown-preview:not([data-use-github-style]) h6 { line-height: 1.2; margin-top: 1.5em; margin-bottom: 0.5em; color: rgb(0, 0, 0); }
+.markdown-preview:not([data-use-github-style]) h1 { font-size: 2.4em; font-weight: 300; }
+.markdown-preview:not([data-use-github-style]) h2 { font-size: 1.8em; font-weight: 400; }
+.markdown-preview:not([data-use-github-style]) h3 { font-size: 1.5em; font-weight: 500; }
+.markdown-preview:not([data-use-github-style]) h4 { font-size: 1.2em; font-weight: 600; }
+.markdown-preview:not([data-use-github-style]) h5 { font-size: 1.1em; font-weight: 600; }
+.markdown-preview:not([data-use-github-style]) h6 { font-size: 1em; font-weight: 600; }
+.markdown-preview:not([data-use-github-style]) strong { color: rgb(0, 0, 0); }
+.markdown-preview:not([data-use-github-style]) del { color: rgb(94, 97, 110); }
+.markdown-preview:not([data-use-github-style]) a, .markdown-preview:not([data-use-github-style]) a code { color: rgb(82, 111, 255); }
+.markdown-preview:not([data-use-github-style]) img { max-width: 100%; }
+.markdown-preview:not([data-use-github-style]) > p { margin-top: 0px; margin-bottom: 1.5em; }
+.markdown-preview:not([data-use-github-style]) > ul, .markdown-preview:not([data-use-github-style]) > ol { margin-bottom: 1.5em; }
+.markdown-preview:not([data-use-github-style]) blockquote { margin: 1.5em 0px; font-size: inherit; color: rgb(94, 97, 110); border-color: rgb(209, 209, 210); border-width: 4px; }
+.markdown-preview:not([data-use-github-style]) hr { margin: 3em 0px; border-top-width: 2px; border-top-style: dashed; border-top-color: rgb(209, 209, 210); background: none; }
+.markdown-preview:not([data-use-github-style]) table { margin: 1.5em 0px; }
+.markdown-preview:not([data-use-github-style]) th { color: rgb(0, 0, 0); }
+.markdown-preview:not([data-use-github-style]) th, .markdown-preview:not([data-use-github-style]) td { padding: 0.66em 1em; border: 1px solid rgb(209, 209, 210); }
+.markdown-preview:not([data-use-github-style]) code { color: rgb(0, 0, 0); background-color: rgb(234, 234, 235); }
+.markdown-preview:not([data-use-github-style]) pre.editor-colors { margin: 1.5em 0px; padding: 1em; font-size: 0.92em; border-radius: 3px; background-color: rgb(240, 240, 240); }
+.markdown-preview:not([data-use-github-style]) kbd { color: rgb(0, 0, 0); border-width: 1px 1px 2px; border-style: solid; border-color: rgb(209, 209, 210) rgb(209, 209, 210) rgb(193, 193, 194); background-color: rgb(234, 234, 235); }
+.markdown-preview[data-use-github-style] { font-family: 'Helvetica Neue', Helvetica, 'Segoe UI', Arial, freesans, sans-serif; line-height: 1.6; word-wrap: break-word; padding: 30px; font-size: 16px; color: rgb(51, 51, 51); overflow: scroll; background-color: rgb(255, 255, 255); }
+.markdown-preview[data-use-github-style] > :first-child { margin-top: 0px !important; }
+.markdown-preview[data-use-github-style] > :last-child { margin-bottom: 0px !important; }
+.markdown-preview[data-use-github-style] a:not([href]) { color: inherit; text-decoration: none; }
+.markdown-preview[data-use-github-style] .absent { color: rgb(204, 0, 0); }
+.markdown-preview[data-use-github-style] .anchor { position: absolute; top: 0px; left: 0px; display: block; padding-right: 6px; padding-left: 30px; margin-left: -30px; }
+.markdown-preview[data-use-github-style] .anchor:focus { outline: none; }
+.markdown-preview[data-use-github-style] h1, .markdown-preview[data-use-github-style] h2, .markdown-preview[data-use-github-style] h3, .markdown-preview[data-use-github-style] h4, .markdown-preview[data-use-github-style] h5, .markdown-preview[data-use-github-style] h6 { position: relative; margin-top: 1em; margin-bottom: 16px; font-weight: bold; line-height: 1.4; }
+.markdown-preview[data-use-github-style] h1 .octicon-link, .markdown-preview[data-use-github-style] h2 .octicon-link, .markdown-preview[data-use-github-style] h3 .octicon-link, .markdown-preview[data-use-github-style] h4 .octicon-link, .markdown-preview[data-use-github-style] h5 .octicon-link, .markdown-preview[data-use-github-style] h6 .octicon-link { display: none; color: rgb(0, 0, 0); vertical-align: middle; }
+.markdown-preview[data-use-github-style] h1:hover .anchor, .markdown-preview[data-use-github-style] h2:hover .anchor, .markdown-preview[data-use-github-style] h3:hover .anchor, .markdown-preview[data-use-github-style] h4:hover .anchor, .markdown-preview[data-use-github-style] h5:hover .anchor, .markdown-preview[data-use-github-style] h6:hover .anchor { padding-left: 8px; margin-left: -30px; text-decoration: none; }
+.markdown-preview[data-use-github-style] h1:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h2:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h3:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h4:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h5:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h6:hover .anchor .octicon-link { display: inline-block; }
+.markdown-preview[data-use-github-style] h1 tt, .markdown-preview[data-use-github-style] h2 tt, .markdown-preview[data-use-github-style] h3 tt, .markdown-preview[data-use-github-style] h4 tt, .markdown-preview[data-use-github-style] h5 tt, .markdown-preview[data-use-github-style] h6 tt, .markdown-preview[data-use-github-style] h1 code, .markdown-preview[data-use-github-style] h2 code, .markdown-preview[data-use-github-style] h3 code, .markdown-preview[data-use-github-style] h4 code, .markdown-preview[data-use-github-style] h5 code, .markdown-preview[data-use-github-style] h6 code { font-size: inherit; }
+.markdown-preview[data-use-github-style] h1 { padding-bottom: 0.3em; font-size: 2.25em; line-height: 1.2; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(238, 238, 238); }
+.markdown-preview[data-use-github-style] h1 .anchor { line-height: 1; }
+.markdown-preview[data-use-github-style] h2 { padding-bottom: 0.3em; font-size: 1.75em; line-height: 1.225; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(238, 238, 238); }
+.markdown-preview[data-use-github-style] h2 .anchor { line-height: 1; }
+.markdown-preview[data-use-github-style] h3 { font-size: 1.5em; line-height: 1.43; }
+.markdown-preview[data-use-github-style] h3 .anchor { line-height: 1.2; }
+.markdown-preview[data-use-github-style] h4 { font-size: 1.25em; }
+.markdown-preview[data-use-github-style] h4 .anchor { line-height: 1.2; }
+.markdown-preview[data-use-github-style] h5 { font-size: 1em; }
+.markdown-preview[data-use-github-style] h5 .anchor { line-height: 1.1; }
+.markdown-preview[data-use-github-style] h6 { font-size: 1em; color: rgb(119, 119, 119); }
+.markdown-preview[data-use-github-style] h6 .anchor { line-height: 1.1; }
+.markdown-preview[data-use-github-style] p, .markdown-preview[data-use-github-style] blockquote, .markdown-preview[data-use-github-style] ul, .markdown-preview[data-use-github-style] ol, .markdown-preview[data-use-github-style] dl, .markdown-preview[data-use-github-style] table, .markdown-preview[data-use-github-style] pre { margin-top: 0px; margin-bottom: 16px; }
+.markdown-preview[data-use-github-style] hr { height: 4px; padding: 0px; margin: 16px 0px; border: 0px none; background-color: rgb(231, 231, 231); }
+.markdown-preview[data-use-github-style] ul, .markdown-preview[data-use-github-style] ol { padding-left: 2em; }
+.markdown-preview[data-use-github-style] ul.no-list, .markdown-preview[data-use-github-style] ol.no-list { padding: 0px; list-style-type: none; }
+.markdown-preview[data-use-github-style] ul ul, .markdown-preview[data-use-github-style] ul ol, .markdown-preview[data-use-github-style] ol ol, .markdown-preview[data-use-github-style] ol ul { margin-top: 0px; margin-bottom: 0px; }
+.markdown-preview[data-use-github-style] li > p { margin-top: 16px; }
+.markdown-preview[data-use-github-style] dl { padding: 0px; }
+.markdown-preview[data-use-github-style] dl dt { padding: 0px; margin-top: 16px; font-size: 1em; font-style: italic; font-weight: bold; }
+.markdown-preview[data-use-github-style] dl dd { padding: 0px 16px; margin-bottom: 16px; }
+.markdown-preview[data-use-github-style] blockquote { padding: 0px 15px; color: rgb(119, 119, 119); border-left-width: 4px; border-left-style: solid; border-left-color: rgb(221, 221, 221); }
+.markdown-preview[data-use-github-style] blockquote > :first-child { margin-top: 0px; }
+.markdown-preview[data-use-github-style] blockquote > :last-child { margin-bottom: 0px; }
+.markdown-preview[data-use-github-style] table { display: block; width: 100%; overflow: auto; word-break: keep-all; }
+.markdown-preview[data-use-github-style] table th { font-weight: bold; }
+.markdown-preview[data-use-github-style] table th, .markdown-preview[data-use-github-style] table td { padding: 6px 13px; border: 1px solid rgb(221, 221, 221); }
+.markdown-preview[data-use-github-style] table tr { border-top-width: 1px; border-top-style: solid; border-top-color: rgb(204, 204, 204); background-color: rgb(255, 255, 255); }
+.markdown-preview[data-use-github-style] table tr:nth-child(2n) { background-color: rgb(248, 248, 248); }
+.markdown-preview[data-use-github-style] img { max-width: 100%; box-sizing: border-box; }
+.markdown-preview[data-use-github-style] .emoji { max-width: none; }
+.markdown-preview[data-use-github-style] span.frame { display: block; overflow: hidden; }
+.markdown-preview[data-use-github-style] span.frame > span { display: block; float: left; width: auto; padding: 7px; margin: 13px 0px 0px; overflow: hidden; border: 1px solid rgb(221, 221, 221); }
+.markdown-preview[data-use-github-style] span.frame span img { display: block; float: left; }
+.markdown-preview[data-use-github-style] span.frame span span { display: block; padding: 5px 0px 0px; clear: both; color: rgb(51, 51, 51); }
+.markdown-preview[data-use-github-style] span.align-center { display: block; overflow: hidden; clear: both; }
+.markdown-preview[data-use-github-style] span.align-center > span { display: block; margin: 13px auto 0px; overflow: hidden; text-align: center; }
+.markdown-preview[data-use-github-style] span.align-center span img { margin: 0px auto; text-align: center; }
+.markdown-preview[data-use-github-style] span.align-right { display: block; overflow: hidden; clear: both; }
+.markdown-preview[data-use-github-style] span.align-right > span { display: block; margin: 13px 0px 0px; overflow: hidden; text-align: right; }
+.markdown-preview[data-use-github-style] span.align-right span img { margin: 0px; text-align: right; }
+.markdown-preview[data-use-github-style] span.float-left { display: block; float: left; margin-right: 13px; overflow: hidden; }
+.markdown-preview[data-use-github-style] span.float-left span { margin: 13px 0px 0px; }
+.markdown-preview[data-use-github-style] span.float-right { display: block; float: right; margin-left: 13px; overflow: hidden; }
+.markdown-preview[data-use-github-style] span.float-right > span { display: block; margin: 13px auto 0px; overflow: hidden; text-align: right; }
+.markdown-preview[data-use-github-style] code, .markdown-preview[data-use-github-style] tt { padding: 0.2em 0px; margin: 0px; font-size: 85%; border-radius: 3px; background-color: rgba(0, 0, 0, 0.0392157); }
+.markdown-preview[data-use-github-style] code::before, .markdown-preview[data-use-github-style] tt::before, .markdown-preview[data-use-github-style] code::after, .markdown-preview[data-use-github-style] tt::after { letter-spacing: -0.2em; content: " "; }
+.markdown-preview[data-use-github-style] code br, .markdown-preview[data-use-github-style] tt br { display: none; }
+.markdown-preview[data-use-github-style] del code { text-decoration: inherit; }
+.markdown-preview[data-use-github-style] pre > code { padding: 0px; margin: 0px; font-size: 100%; word-break: normal; white-space: pre; border: 0px; background: transparent; }
+.markdown-preview[data-use-github-style] .highlight { margin-bottom: 16px; }
+.markdown-preview[data-use-github-style] .highlight pre, .markdown-preview[data-use-github-style] pre { padding: 16px; overflow: auto; font-size: 85%; line-height: 1.45; border-radius: 3px; background-color: rgb(247, 247, 247); }
+.markdown-preview[data-use-github-style] .highlight pre { margin-bottom: 0px; word-break: normal; }
+.markdown-preview[data-use-github-style] pre { word-wrap: normal; }
+.markdown-preview[data-use-github-style] pre code, .markdown-preview[data-use-github-style] pre tt { display: inline; max-width: initial; padding: 0px; margin: 0px; overflow: initial; line-height: inherit; word-wrap: normal; border: 0px; background-color: transparent; }
+.markdown-preview[data-use-github-style] pre code::before, .markdown-preview[data-use-github-style] pre tt::before, .markdown-preview[data-use-github-style] pre code::after, .markdown-preview[data-use-github-style] pre tt::after { content: normal; }
+.markdown-preview[data-use-github-style] kbd { display: inline-block; padding: 3px 5px; font-size: 11px; line-height: 10px; color: rgb(85, 85, 85); vertical-align: middle; border-style: solid; border-width: 1px; border-color: rgb(204, 204, 204) rgb(204, 204, 204) rgb(187, 187, 187); border-radius: 3px; box-shadow: rgb(187, 187, 187) 0px -1px 0px inset; background-color: rgb(252, 252, 252); }
+.markdown-preview[data-use-github-style] a { color: rgb(51, 122, 183); }
+.markdown-preview[data-use-github-style] code { color: inherit; }
+.markdown-preview[data-use-github-style] pre.editor-colors { padding: 0.8em 1em; margin-bottom: 1em; font-size: 0.85em; border-radius: 4px; overflow: auto; }
+.scrollbars-visible-always .markdown-preview pre.editor-colors::shadow .vertical-scrollbar, .scrollbars-visible-always .markdown-preview pre.editor-colors::shadow .horizontal-scrollbar { visibility: hidden; }
+.scrollbars-visible-always .markdown-preview pre.editor-colors:hover::shadow .vertical-scrollbar, .scrollbars-visible-always .markdown-preview pre.editor-colors:hover::shadow .horizontal-scrollbar { visibility: visible; }
+.pos_bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.sans {
+  font-family: "HelveticaNeue", Helvetica, Verdana, Arial, sans-serif;
+}
+.monospace {
+  font-family: Menlo, "Deja Vu Sans Mono", Consolas, monospace;
+}
+#toc {
+  background-color: #f5f5f5;
+  padding: 0.5em 1em;
+  width: 12em;
+}
+.a_nocolor a {
+  color: inherit;
+}
+.a_stealth a {
+  color: inherit;
+}
+.a_stealth a,
+.a_stealth a:hover {
+  text-decoration: none;
+}
+.a_hover a {
+  text-decoration: none;
+}
+.a_hover a:hover {
+  text-decoration: underline;
+}
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+hr.separator {
+  padding-bottom: 2em;
+}
+div.separator {
+  padding-bottom: 4em;
+}
+.dropdown:hover > ul.dropdown-menu {
+  display: block;
+}
+.dropdown ul.dropdown-menu {
+  margin-top: -1px;
+}
+.user-color-square {
+  display: inline-block;
+  height: 12px;
+  width: 12px;
+  margin: 0 5px 1px 2px;
+  vertical-align: middle;
+  border: 1px solid rgba(96, 96, 96, 0.5);
+  opacity: 0.6;
+}
+input.autocomplete {
+  margin-bottom: 0;
+  width: 20em;
+}
+ul.autocomplete_results {
+  border: 1px solid #bebebe;
+  list-style: none;
+  margin-top: -2px;
+  margin-left: 0;
+  padding-left: 0;
+}
+ul.autocomplete_results li {
+  cursor: pointer;
+  margin: 2px 0 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 2px 2px 2px 4px;
+}
+ul.autocomplete_results li:first-child {
+  padding-top: 4px;
+}
+ul.autocomplete_results li:last-child {
+  padding-bottom: 4px;
+}
+ul.autocomplete_results li:hover,
+ul.autocomplete_results li.selected {
+  color: #eaebed;
+  background-color: #353a4f;
+}
+.workspace-wizard {
+  text-align: center;
+  font-size: 15px;
+}
+.workspace-wizard a {
+  text-decoration: underline;
+  color: #dd0000;
+}
+.workspace-wizard .wizard-section {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border: 0px solid #ededed;
+  border-bottom-width: 1px;
+}
+.workspace-wizard .wizard-section-no-border {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border: 0px solid #ededed;
+  border-bottom-width: 1px;
+  border: 0;
+}
+.workspace-wizard table,
+.workspace-wizard label {
+  font-size: 15px;
+}
+.workspace-wizard label {
+  display: inline-block;
+  margin-right: 10px;
+}
+.wizard-button-bar {
+  margin-top: 20px;
+  text-align: right;
+}
+#edit-perms-content-wizard .everyone-can {
+  text-align: center;
+}
+#edit-perms-content-wizard .everyone-can table {
+  margin: 0 auto;
+}
+#edit-perms-content-wizard td {
+  padding: 5px;
+  text-align: left;
+}
+#edit-perms-content-wizard td label {
+  font-size: 12px;
+}
+#edit-perms-content-wizard #all-perms-content label {
+  font-size: 12px;
+}
+#edit-perms-content-wizard input[type=text] {
+  border: 1px solid #afafaf;
+  width: 200px;
+  outline: none;
+  box-shadow: none;
+}
+#edit-perms-content-wizard input[type=text]:focus {
+  box-shadow: none;
+  outline: none;
+}
+#edit-perms-content-wizard .autocomplete-content {
+  position: relative;
+}
+#edit-perms-content-wizard .autocomplete-content .edit-perms-autocomplete-results {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 200px;
+  background-color: #FFF;
+  border: 1px solid #afafaf;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+@-webkit-keyframes floobits-highlight-animation {
+  0% {
+    opacity: .5;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.floobits a {
+  outline: none !important;
+}
+.floobits-highlight-dark_black .region {
+  background-color: black;
+  opacity: .3;
+}
+.floobits-border-dark_black .region {
+  background-color: black;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_black.line-number:before {
+  border-right: 2px solid black;
+  content: " ";
+}
+.floobits-highlight-dark_blue .region {
+  background-color: blue;
+  opacity: .3;
+}
+.floobits-border-dark_blue .region {
+  background-color: blue;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_blue.line-number:before {
+  border-right: 2px solid blue;
+  content: " ";
+}
+.floobits-highlight-dark_darkblue .region {
+  background-color: darkblue;
+  opacity: .3;
+}
+.floobits-border-dark_darkblue .region {
+  background-color: darkblue;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_darkblue.line-number:before {
+  border-right: 2px solid darkblue;
+  content: " ";
+}
+.floobits-highlight-dark_fuchsia .region {
+  background-color: fuchsia;
+  opacity: .3;
+}
+.floobits-border-dark_fuchsia .region {
+  background-color: fuchsia;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_fuchsia.line-number:before {
+  border-right: 2px solid fuchsia;
+  content: " ";
+}
+.floobits-highlight-dark_gray .region {
+  background-color: gray;
+  opacity: .3;
+}
+.floobits-border-dark_gray .region {
+  background-color: gray;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_gray.line-number:before {
+  border-right: 2px solid gray;
+  content: " ";
+}
+.floobits-highlight-dark_green .region {
+  background-color: green;
+  opacity: .3;
+}
+.floobits-border-dark_green .region {
+  background-color: green;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_green.line-number:before {
+  border-right: 2px solid green;
+  content: " ";
+}
+.floobits-highlight-dark_greenyellow .region {
+  background-color: greenyellow;
+  opacity: .3;
+}
+.floobits-border-dark_greenyellow .region {
+  background-color: greenyellow;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_greenyellow.line-number:before {
+  border-right: 2px solid greenyellow;
+  content: " ";
+}
+.floobits-highlight-dark_indigo .region {
+  background-color: indigo;
+  opacity: .3;
+}
+.floobits-border-dark_indigo .region {
+  background-color: indigo;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_indigo.line-number:before {
+  border-right: 2px solid indigo;
+  content: " ";
+}
+.floobits-highlight-dark_lime .region {
+  background-color: lime;
+  opacity: .3;
+}
+.floobits-border-dark_lime .region {
+  background-color: lime;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_lime.line-number:before {
+  border-right: 2px solid lime;
+  content: " ";
+}
+.floobits-highlight-dark_magenta .region {
+  background-color: magenta;
+  opacity: .3;
+}
+.floobits-border-dark_magenta .region {
+  background-color: magenta;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_magenta.line-number:before {
+  border-right: 2px solid magenta;
+  content: " ";
+}
+.floobits-highlight-dark_maroon .region {
+  background-color: maroon;
+  opacity: .3;
+}
+.floobits-border-dark_maroon .region {
+  background-color: maroon;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_maroon.line-number:before {
+  border-right: 2px solid maroon;
+  content: " ";
+}
+.floobits-highlight-dark_midnightblue .region {
+  background-color: midnightblue;
+  opacity: .3;
+}
+.floobits-border-dark_midnightblue .region {
+  background-color: midnightblue;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_midnightblue.line-number:before {
+  border-right: 2px solid midnightblue;
+  content: " ";
+}
+.floobits-highlight-dark_orange .region {
+  background-color: orange;
+  opacity: .3;
+}
+.floobits-border-dark_orange .region {
+  background-color: orange;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_orange.line-number:before {
+  border-right: 2px solid orange;
+  content: " ";
+}
+.floobits-highlight-dark_orangered .region {
+  background-color: orangered;
+  opacity: .3;
+}
+.floobits-border-dark_orangered .region {
+  background-color: orangered;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_orangered.line-number:before {
+  border-right: 2px solid orangered;
+  content: " ";
+}
+.floobits-highlight-dark_purple .region {
+  background-color: purple;
+  opacity: .3;
+}
+.floobits-border-dark_purple .region {
+  background-color: purple;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_purple.line-number:before {
+  border-right: 2px solid purple;
+  content: " ";
+}
+.floobits-highlight-dark_red .region {
+  background-color: red;
+  opacity: .3;
+}
+.floobits-border-dark_red .region {
+  background-color: red;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_red.line-number:before {
+  border-right: 2px solid red;
+  content: " ";
+}
+.floobits-highlight-dark_teal .region {
+  background-color: teal;
+  opacity: .3;
+}
+.floobits-border-dark_teal .region {
+  background-color: teal;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_teal.line-number:before {
+  border-right: 2px solid teal;
+  content: " ";
+}
+.floobits-highlight-dark_yellow .region {
+  background-color: yellow;
+  opacity: .3;
+}
+.floobits-border-dark_yellow .region {
+  background-color: yellow;
+  -webkit-animation: floobits-highlight-animation 2s ease 1;
+  opacity: 0;
+}
+.floobits-highlight-dark_yellow.line-number:before {
+  border-right: 2px solid yellow;
+  content: " ";
+}
+floobits-conflicts div {
+  padding: 10px;
+}
+input.floobits-submit {
+  color: black;
+  min-width: 125px;
+  content: 'Select Directory';
+  display: inline-block;
+  background: -webkit-linear-gradient(top, #f9f9f9, #e3e3e3);
+  border: 1px solid #999;
+  border-radius: 3px;
+  padding: 5px 8px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  text-shadow: 1px 1px #fff;
+  font-weight: 700;
+  font-size: 10pt;
+  float: right;
+}
+
+.bracket-matcher .region {
+  border-bottom: 1px dotted lime;
+  position: absolute;
+}
+
+pre.editor-colors,
+.host {
+  background-color: #fafafa;
+  color: #383a42;
+}
+pre.editor-colors .line.cursor-line,
+.host .line.cursor-line {
+  background-color: rgba(56, 58, 66, 0.04);
+}
+pre.editor-colors .invisible,
+.host .invisible {
+  color: #383a42;
+}
+pre.editor-colors .cursor,
+.host .cursor {
+  border-left: 2px solid #526fff;
+}
+pre.editor-colors .selection .region,
+.host .selection .region {
+  background-color: #ededed;
+}
+pre.editor-colors .bracket-matcher .region,
+.host .bracket-matcher .region {
+  border-bottom: 1px solid #526fff;
+  box-sizing: border-box;
+}
+pre.editor-colors .invisible-character,
+.host .invisible-character {
+  color: rgba(56, 58, 66, 0.2);
+}
+pre.editor-colors .indent-guide,
+.host .indent-guide {
+  color: rgba(56, 58, 66, 0.2);
+}
+pre.editor-colors .wrap-guide,
+.host .wrap-guide {
+  background-color: rgba(56, 58, 66, 0.2);
+}
+pre.editor-colors .gutter .line-number,
+.host .gutter .line-number {
+  color: #9d9d9f;
+  -webkit-font-smoothing: antialiased;
+}
+pre.editor-colors .gutter .line-number.cursor-line,
+.host .gutter .line-number.cursor-line {
+  color: #383a42;
+  background-color: #f2f2f2;
+}
+pre.editor-colors .gutter .line-number.cursor-line-no-selection,
+.host .gutter .line-number.cursor-line-no-selection {
+  background-color: transparent;
+}
+pre.editor-colors .gutter .line-number .icon-right,
+.host .gutter .line-number .icon-right {
+  color: #383a42;
+}
+pre.editor-colors .gutter:not(.git-diff-icon) .line-number.git-line-removed.git-line-removed::before,
+.host .gutter:not(.git-diff-icon) .line-number.git-line-removed.git-line-removed::before {
+  bottom: -3px;
+}
+pre.editor-colors .gutter:not(.git-diff-icon) .line-number.git-line-removed::after,
+.host .gutter:not(.git-diff-icon) .line-number.git-line-removed::after {
+  content: "";
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 25px;
+  border-bottom: 1px dotted rgba(255, 20, 20, 0.5);
+  pointer-events: none;
+}
+pre.editor-colors .gutter .line-number.folded,
+.host .gutter .line-number.folded,
+pre.editor-colors .gutter .line-number:after,
+.host .gutter .line-number:after,
+pre.editor-colors .fold-marker:after,
+.host .fold-marker:after {
+  color: #383a42;
+}
+.comment {
+  color: #a0a1a7;
+  font-style: italic;
+}
+.comment .markup.link {
+  color: #a0a1a7;
+}
+.entity.name.type {
+  color: #c18401;
+}
+.entity.other.inherited-class {
+  color: #50a14f;
+}
+.keyword {
+  color: #a626a4;
+}
+.keyword.control {
+  color: #a626a4;
+}
+.keyword.operator {
+  color: #383a42;
+}
+.keyword.other.special-method {
+  color: #4078f2;
+}
+.keyword.other.unit {
+  color: #986801;
+}
+.storage {
+  color: #a626a4;
+}
+.storage.type.annotation,
+.storage.type.primitive {
+  color: #a626a4;
+}
+.storage.modifier.package,
+.storage.modifier.import {
+  color: #383a42;
+}
+.constant {
+  color: #986801;
+}
+.constant.variable {
+  color: #986801;
+}
+.constant.character.escape {
+  color: #0184bc;
+}
+.constant.numeric {
+  color: #986801;
+}
+.constant.other.color {
+  color: #0184bc;
+}
+.constant.other.symbol {
+  color: #0184bc;
+}
+.variable {
+  color: #e45649;
+}
+.variable.interpolation {
+  color: #ca1243;
+}
+.variable.parameter {
+  color: #383a42;
+}
+.string {
+  color: #50a14f;
+}
+.string.regexp {
+  color: #0184bc;
+}
+.string.regexp .source.ruby.embedded {
+  color: #c18401;
+}
+.string.other.link {
+  color: #e45649;
+}
+.punctuation.definition.comment {
+  color: #a0a1a7;
+}
+.punctuation.definition.method-parameters,
+.punctuation.definition.function-parameters,
+.punctuation.definition.parameters,
+.punctuation.definition.separator,
+.punctuation.definition.seperator,
+.punctuation.definition.array {
+  color: #383a42;
+}
+.punctuation.definition.heading,
+.punctuation.definition.identity {
+  color: #4078f2;
+}
+.punctuation.definition.bold {
+  color: #c18401;
+  font-weight: bold;
+}
+.punctuation.definition.italic {
+  color: #a626a4;
+  font-style: italic;
+}
+.punctuation.section.embedded {
+  color: #ca1243;
+}
+.punctuation.section.method,
+.punctuation.section.class,
+.punctuation.section.inner-class {
+  color: #383a42;
+}
+.support.class {
+  color: #c18401;
+}
+.support.type {
+  color: #0184bc;
+}
+.support.function {
+  color: #0184bc;
+}
+.support.function.any-method {
+  color: #4078f2;
+}
+.entity.name.function {
+  color: #4078f2;
+}
+.entity.name.class,
+.entity.name.type.class {
+  color: #c18401;
+}
+.entity.name.section {
+  color: #4078f2;
+}
+.entity.name.tag {
+  color: #e45649;
+}
+.entity.other.attribute-name {
+  color: #986801;
+}
+.entity.other.attribute-name.id {
+  color: #4078f2;
+}
+.meta.class {
+  color: #c18401;
+}
+.meta.class.body {
+  color: #383a42;
+}
+.meta.method-call,
+.meta.method {
+  color: #383a42;
+}
+.meta.definition.variable {
+  color: #e45649;
+}
+.meta.link {
+  color: #986801;
+}
+.meta.require {
+  color: #4078f2;
+}
+.meta.selector {
+  color: #a626a4;
+}
+.meta.separator {
+  background-color: #373b41;
+  color: #383a42;
+}
+.meta.tag {
+  color: #383a42;
+}
+.underline {
+  text-decoration: underline;
+}
+.none {
+  color: #383a42;
+}
+.invalid.deprecated {
+  color: #000000 !important;
+  background-color: #f2a60d !important;
+}
+.invalid.illegal {
+  color: #ffffff !important;
+  background-color: #ff1414 !important;
+}
+.markup.bold {
+  color: #986801;
+  font-weight: bold;
+}
+.markup.changed {
+  color: #a626a4;
+}
+.markup.deleted {
+  color: #e45649;
+}
+.markup.italic {
+  color: #a626a4;
+  font-style: italic;
+}
+.markup.heading {
+  color: #e45649;
+}
+.markup.heading .punctuation.definition.heading {
+  color: #4078f2;
+}
+.markup.link {
+  color: #a626a4;
+}
+.markup.inserted {
+  color: #50a14f;
+}
+.markup.quote {
+  color: #986801;
+}
+.markup.raw {
+  color: #50a14f;
+}
+.source.cs .keyword.operator {
+  color: #a626a4;
+}
+.source.css .property-name,
+.source.css .property-value {
+  color: #696c77;
+}
+.source.css .property-name.support,
+.source.css .property-value.support {
+  color: #383a42;
+}
+.source.gfm .markup {
+  -webkit-font-smoothing: auto;
+}
+.source.gfm .link .entity {
+  color: #4078f2;
+}
+.source.ini .keyword.other.definition.ini {
+  color: #e45649;
+}
+.source.java .storage.modifier.import {
+  color: #c18401;
+}
+.source.java .storage.type {
+  color: #c18401;
+}
+.source.java-properties .meta.key-pair {
+  color: #e45649;
+}
+.source.java-properties .meta.key-pair > .punctuation {
+  color: #383a42;
+}
+.source.js .keyword.operator {
+  color: #0184bc;
+}
+.source.js .keyword.operator.delete,
+.source.js .keyword.operator.in,
+.source.js .keyword.operator.of,
+.source.js .keyword.operator.instanceof,
+.source.js .keyword.operator.new,
+.source.js .keyword.operator.typeof,
+.source.js .keyword.operator.void {
+  color: #a626a4;
+}
+.source.json .meta.structure.dictionary.json > .string.quoted.json {
+  color: #e45649;
+}
+.source.json .meta.structure.dictionary.json > .string.quoted.json > .punctuation.string {
+  color: #e45649;
+}
+.source.json .meta.structure.dictionary.json > .value.json > .string.quoted.json,
+.source.json .meta.structure.array.json > .value.json > .string.quoted.json,
+.source.json .meta.structure.dictionary.json > .value.json > .string.quoted.json > .punctuation,
+.source.json .meta.structure.array.json > .value.json > .string.quoted.json > .punctuation {
+  color: #50a14f;
+}
+.source.json .meta.structure.dictionary.json > .constant.language.json,
+.source.json .meta.structure.array.json > .constant.language.json {
+  color: #0184bc;
+}
+.source.ruby .constant.other.symbol > .punctuation {
+  color: inherit;
+}
+.source.python .keyword.operator.logical.python {
+  color: #a626a4;
+}
+.source.python .variable.parameter {
+  color: #986801;
+}
+</style>
+  </head>
+  <body class='markdown-preview'><h1 id="-this-object-prototypes"><code>this</code> &amp; Object Prototypes</h1>
+<h2 id="-this-or-that-"><code>this</code> or That?</h2>
+<ul>
+<li>The <code>this</code> mechanism provides a cleaner way of &quot;passing along&quot; an object.</li>
+</ul>
+<p>Function declarations add function name to the current scope, so no issue calling the function from within itself because even if itself was not part of own lexical scope, it would fall back to the enclosing scope which contains a reference to it. However, since named function expressions are able to reference themselves within their scope, I am assuming that the name of the function gets added to both the scope where it is defined <em>and</em> the scope it creates.</p>
+<h2 id="-this-all-makes-sense-now"><code>this</code> All Makes Sense Now</h2>
+<ul>
+<li><code>this</code> is a binding dependant on its function&#39;s <strong>call-site</strong>.</li>
+<li>Four cases for binding: <strong>Default</strong>, <strong>Implicit</strong>, <strong>Explicit</strong>, <strong><code>new</code></strong>.</li>
+<li>If a primitive type is passed in explicit binding, it will be boxed: <code>new String()</code>, <code>new Boolean()</code>, <code>new Number()</code>.</li>
+<li><strong>Hard Binding</strong> is a pattern where the desired binding is explicitly set within the scope of another function, which can then be used elsewhere. If a framework changes the <code>this</code> of the outer function, the explicit binding within it will remain.<pre class="editor-colors lang-js"><div class="line"><span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;simple&nbsp;`bind`&nbsp;helper</span><span>&nbsp;</span></span></span></div><div class="line"><span class="source js"><span class="meta function js"><span class="storage type function js"><span>function</span></span><span>&nbsp;</span><span class="entity name function js"><span>bind</span></span><span class="punctuation definition parameters begin js"><span>(</span></span><span class="variable parameter function js"><span>fn</span></span><span class="meta object delimiter js"><span>,</span></span><span>&nbsp;</span><span class="variable parameter function js"><span>obj</span></span><span class="punctuation definition parameters end js"><span>)</span></span></span><span>&nbsp;</span><span class="meta brace curly js"><span>{</span></span></span></div><div class="line"><span class="source js"><span>&nbsp;&nbsp;</span><span class="keyword control js"><span>return</span></span><span>&nbsp;</span><span class="meta function js"><span class="storage type function js"><span>function</span></span><span class="punctuation definition parameters begin js"><span>(</span></span><span class="punctuation definition parameters end js"><span>)</span></span></span><span>&nbsp;</span><span class="meta brace curly js"><span>{</span></span></span></div><div class="line"><span class="source js"><span>&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="keyword control js"><span>return</span></span><span>&nbsp;</span><span class="variable other object js"><span>fn</span></span><span class="meta method-call js"><span class="meta delimiter method period js"><span>.</span></span><span class="support function js"><span>apply</span></span><span class="meta arguments js"><span class="punctuation definition arguments begin bracket round js"><span>(</span></span><span>obj</span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;arguments</span><span class="punctuation definition arguments end bracket round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span></div><div class="line"><span class="source js"><span>&nbsp;&nbsp;</span><span class="meta brace curly js"><span>}</span></span><span class="punctuation terminator statement js"><span>;</span></span></span></div><div class="line"><span class="source js"><span class="meta brace curly js"><span>}</span></span></span></div></pre>
+</li>
+<li>Hard binding so common that ES5 introduced <code>Function.prototype.bind</code> which does what the snippet above does:<pre class="editor-colors lang-js"><div class="line"><span class="source js"><span class="storage type var js"><span>var</span></span><span>&nbsp;b&nbsp;</span><span class="keyword operator assignment js"><span>=</span></span><span>&nbsp;</span><span class="variable other object js"><span>myFunc</span></span><span class="meta method-call js"><span class="meta delimiter method period js"><span>.</span></span><span class="entity name function js"><span>bind</span></span><span class="meta arguments js"><span class="punctuation definition arguments begin bracket round js"><span>(</span></span><span>objToBindTo</span><span class="punctuation definition arguments end bracket round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span></div><div class="line"><span class="source js"><span class="entity name type object console js"><span>console</span></span><span class="meta method-call js"><span class="meta delimiter method period js"><span>.</span></span><span class="support function console js"><span>log</span></span><span class="meta arguments js"><span class="punctuation definition arguments begin bracket round js"><span>(</span></span><span class="variable other object js"><span>b</span></span><span class="meta delimiter property period js"><span>.</span></span><span class="support constant dom js"><span>name</span></span><span class="punctuation definition arguments end bracket round js"><span>)</span></span></span></span><span>&nbsp;</span><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;&quot;bound&nbsp;myFunc&quot;.&nbsp;Will&nbsp;show&nbsp;up&nbsp;in&nbsp;stack&nbsp;trace</span><span>&nbsp;</span></span></span></div></pre>
+</li>
+<li>In JS, constructors are just functions that happen to be called with <code>new</code>.</li>
+<li><code>new</code> steps: brand new object created, its prototype linked to the object <code>theFunc.prototype</code>, <code>this</code> is bound to newly created object, <code>new</code> experession evaluated to the newly created object unless the function returns a different object.</li>
+<li>Creation of totally empty object to assign to <code>this</code> during explicit binding call: <code>Object.create(null)</code>.</li>
+<li>Useful for calling functions with <code>apply</code> with array of arguments (esp. functions you don&#39;t control) b/c with null/undefined could get bound to global if non strict mode.</li>
+<li>ES6 <code>func(...[a,b,c]);</code></li>
+<li>ES6 fat arrow notation <code>=&gt;</code>. <code>this</code> of fat arrow function is same as that of enclosing scope: <strong>lexical <code>this</code></strong>.</li>
+</ul>
+<h2 id="objects">Objects</h2>
+<ul>
+<li>Better to create them in literal syntax.</li>
+<li>Six primary types: <code>string</code>, <code>number</code>, <code>boolean</code>, <code>null</code>, <code>undefined</code>, <code>object</code>.</li>
+<li>Five primitive types (all but object).</li>
+<li>Built-in objects: <code>String</code>, <code>Number</code>, <code>Boolean</code>, <code>Object</code>, <code>Function</code>, <code>Array</code>, <code>Date</code>, <code>RegExp</code>, <code>Error</code>.</li>
+<li>&quot;Built-in objects&quot; are all functions. Remember, a function is a sub-type of object.</li>
+<li>A function is just a callable object.</li>
+<li>When primitives are used, they are coerced into one of these objects if necessary.</li>
+<li><code>null</code> and <code>undefined</code> have no wrapper/box.</li>
+<li><code>Object</code>s, <code>Array</code>s, <code>Function</code>s and <code>RegExp</code>s are always objects</li>
+<li>Don&#39;t use built-in objects as constructors unless the extra functionality they offer is needed.</li>
+<li>Even properties have properties:<pre class="editor-colors lang-js"><div class="line"><span class="source js"><span class="support class js"><span>Object</span></span><span class="meta method-call js"><span class="meta delimiter method period js"><span>.</span></span><span class="entity name function js"><span>defineProperty</span></span><span class="meta arguments js"><span class="punctuation definition arguments begin bracket round js"><span>(</span></span><span>myObject</span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>&#39;</span></span><span>a</span><span class="punctuation definition string end js"><span>&#39;</span></span></span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="meta brace curly js"><span>{</span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta method-call js"><span class="meta arguments js"><span>value</span><span class="keyword operator js"><span>:</span></span><span>&nbsp;</span><span class="constant numeric decimal js"><span>2</span></span><span class="meta delimiter object comma js"><span>,</span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta method-call js"><span class="meta arguments js"><span>writable</span><span class="keyword operator js"><span>:</span></span><span>&nbsp;</span><span class="constant language boolean true js"><span>true</span></span><span class="meta delimiter object comma js"><span>,</span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta method-call js"><span class="meta arguments js"><span>configurable</span><span class="keyword operator js"><span>:</span></span><span>&nbsp;</span><span class="constant language boolean true js"><span>true</span></span><span class="meta delimiter object comma js"><span>,</span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta method-call js"><span class="meta arguments js"><span>enumberable</span><span class="keyword operator js"><span>:</span></span><span>&nbsp;</span><span class="constant language boolean true js"><span>true</span></span></span></span></span></div><div class="line"><span class="source js"><span class="meta method-call js"><span class="meta arguments js"><span class="meta brace curly js"><span>}</span></span><span class="punctuation definition arguments end bracket round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span></div></pre>
+</li>
+<li><code>Object.preventExtensions(myObj);</code></li>
+<li><code>Object.seal(myObj);</code></li>
+<li><code>Object.freeze(myObj);</code></li>
+<li><code>[[Get]]</code> and <code>[[Set]]</code> operations can be modified on a per property basis.</li>
+<li>Keyword <code>in</code> checks object and prototype chain, for-in loops too!</li>
+<li>Alternatively, <code>myObj.hasOwnProperty(&#39;a&#39;);</code> does not follow prototype.</li>
+<li>For object without prototype, <code>Object.prototype.hasOwnProperty.call(myObj, &#39;a&#39;);</code>.</li>
+</ul>
+<h1 id="mixing-up-class-objects">Mixing (Up) &quot;Class&quot; Objects</h1>
+<h1 id="prototypes">Prototypes</h1>
+<ul>
+<li><code>for..in</code> will check entire prototype chain for <code>enumerable</code> properties.</li>
+<li>The <code>in</code> operator checks entire prototype chain.
+Important to understand how assignment is made, scenario: <code>myObject.foo = &#39;bar&#39;;</code> and foo is <strong>not</strong> in <code>myObject</code> but <strong>is</strong> in <code>[[Prototype]]</code> chain.</li>
+<li>Normal data accessor in <code>[[Prototype]]</code> with <code>writable:true</code>, then <code>foo</code> is added to <code>myObject</code>.</li>
+<li>Normal data accessor with <code>writable:false</code>, error thrown in strict mode.</li>
+<li><code>foo</code> is found in <code>[[Prototype]]</code> as a setter, runs the setter.
+For cases 2 and 3 must use <code>Object.defineProperty</code>.</li>
+<li>No class &quot;blueprints&quot;, <em>there&#39;s just the object</em>.</li>
+<li>All functions (function object) get <code>prototype</code>, &quot;Foo&#39;s prototype&quot; --&gt; &quot;the object formerly known as Foo&#39;s prototype&quot; === &quot;object arbitrarily labeled &#39;Foo dot prototype&#39;&quot;.</li>
+<li>The object <code>prototype</code> is only linked automatically to functions.</li>
+<li>The prototype chain is just based on a &quot;link&quot; between objects, and some strange behavior comes from the fact that all functions have a <code>prototype</code> object to which all objects created with <code>new Func</code> get linked to.</li>
+<li>More interestingly still, <code>protoype</code> has <code>prototype.constructor</code> which is a reference to the function itself.</li>
+<li>Functions aren&#39;t constructors, but function calls are &quot;constructor calls&quot; if and only if <code>new</code> is used.</li>
+<li>At the topmost level of a typical <code>[[Prototype]]</code> chain is one of the built-in function&#39;s <code>prototype</code> object.</li>
+<li>JS is just a language that provides objects and primitive types, callable objects are functions, and the language provides 7 default functions that by default have a prototype and that by default end up creating all objects and functions used. Provides autoboxing for primitives, and a way to have no prototype linked free floating objects.</li>
+<li>Prototype and constructor properties are just filled in and linked by default, but they are no more special than any other object, and therefore may be just as well overwritten.</li>
+<li>The concept of prototype is that of a delegation/backup object for properties.</li>
+<li>Prior to ES6, can&#39;t change prototype of an object.</li>
+<li><code>instanceOf</code> needs object and function. Automatically assumes function has a <code>.prototype</code> and checks to see whether that object that belongs to the function object is in the prototype chain of the object.<pre class="editor-colors lang-js"><div class="line"><span class="source js"><span>a&nbsp;</span><span class="keyword operator instanceof js"><span>instanceof</span></span><span>&nbsp;Foo</span><span class="punctuation terminator statement js"><span>;</span></span></span></div></pre>
+</li>
+<li><code>.isPrototypeOf</code> works with two objects.<pre class="editor-colors lang-js"><div class="line"><span class="source js"><span class="variable other object js"><span>ob1</span></span><span class="meta method-call js"><span class="meta delimiter method period js"><span>.</span></span><span class="entity name function js"><span>isPrototypeOf</span></span><span class="meta arguments js"><span class="punctuation definition arguments begin bracket round js"><span>(</span></span><span>ob2</span><span class="punctuation definition arguments end bracket round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span></div></pre>
+</li>
+<li>Basically <code>instanceof</code> of is a particular case of <code>isPrototypeOf</code> that assumes that one of the objects is the <code>prototype</code> property of the supplied function.</li>
+<li>To access an object&#39;s prototype: <code>Object.getPrototypeOf(ob);</code>.</li>
+<li>If you dont want to jump through function prototype hoops, just use <code>Object.create(..);</code>.</li>
+</ul>
+<h2 id="behavior-delegation">Behavior Delegation</h2>
+<ul>
+<li>The important functionality to leverage in JavaScript is all about objects being linked to other objects.</li>
+<li>It is good practice to not rely on links as fallbacks: hard to maintain code. Better to make a property that calls the fallback method to explicitly state that we are relying on prototype linkage as a fallback.</li>
+<li>Circular linkage references are disallowed.</li>
+<li>When coding with OLOO (Objects Linked to Other Objects) style, the <em>who</em> &quot;constructed&quot; any given object is an irrelevant detail.</li>
+</ul></body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/default.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+</head>
+
+<body>
+  <h1 id="this-object-prototypes"><code>this</code> &amp; Object Prototypes</h1>
+  <h2 id="this-or-that"><code>this</code> or That?</h2>
+  <ul>
+    <li>The <code>this</code> mechanism provides a cleaner way of &quot;passing along&quot; an object.</li>
+  </ul>
+  <p>Function declarations add function name to the current scope, so no issue calling the function from within itself because even if itself was not part of own lexical scope, it would fall back to the enclosing scope which contains a reference to it. However,
+    since named function expressions are able to reference themselves within their scope, I am assuming that the name of the function gets added to both the scope where it is defined <em>and</em> the scope it creates.</p>
+  <h2 id="this-all-makes-sense-now"><code>this</code> All Makes Sense Now</h2>
+  <ul>
+    <li><code>this</code> is a binding dependant on its function's <strong>call-site</strong>.</li>
+    <li>Four cases for binding: <strong>Default</strong>, <strong>Implicit</strong>, <strong>Explicit</strong>, <strong><code>new</code></strong>.</li>
+    <li>If a primitive type is passed in explicit binding, it will be boxed: <code>new String()</code>, <code>new Boolean()</code>, <code>new Number()</code>.</li>
+    <li>
+      <p><strong>Hard Binding</strong> is a pattern where the desired binding is explicitly set within the scope of another function, which can then be used elsewhere. If a framework changes the <code>this</code> of the outer function, the explicit binding
+        within it will remain.</p>
+      <div class="sourceCode"><pre class="sourceCode js"><code class="sourceCode javascript"><span class="co">// simple `bind` helper</span>
+            <span class="kw">function</span> <span class="at">bind</span>(fn<span class="op">,</span> obj) <span class="op">{</span>
+              <span class="cf">return</span> <span class="kw">function</span>() <span class="op">{</span>
+                <span class="cf">return</span> <span class="va">fn</span>.<span class="at">apply</span>(obj<span class="op">,</span> arguments)<span class="op">;</span>
+                <span class="op">};</span>
+                <span class="op">}</span></code></pre></div>
+    </li>
+    <li>
+      <p>Hard binding so common that ES5 introduced <code>Function.prototype.bind</code> which does what the snippet above does:</p>
+      <div class="sourceCode"><pre class="sourceCode js"><code class="sourceCode javascript"><span class="kw">var</span> b <span class="op">=</span> <span class="va">myFunc</span>.<span class="at">bind</span>(objToBindTo)<span class="op">;</span>
+                  <span class="va">console</span>.<span class="at">log</span>(<span class="va">b</span>.<span class="at">name</span>) <span class="co">// &quot;bound myFunc&quot;. Will show up in stack trace</span></code></pre></div>
+    </li>
+    <li>In JS, constructors are just functions that happen to be called with <code>new</code>.</li>
+    <li><code>new</code> steps: brand new object created, its prototype linked to the object <code>theFunc.prototype</code>, <code>this</code> is bound to newly created object, <code>new</code> experession evaluated to the newly created object unless the
+      function returns a different object.</li>
+    <li>Creation of totally empty object to assign to <code>this</code> during explicit binding call: <code>Object.create(null)</code>.</li>
+    <li>Useful for calling functions with <code>apply</code> with array of arguments (esp. functions you don't control) b/c with null/undefined could get bound to global if non strict mode.</li>
+    <li>ES6 <code>func(...[a,b,c]);</code></li>
+    <li>
+      <p>ES6 fat arrow notation <code>=&gt;</code>. <code>this</code> of fat arrow function is same as that of enclosing scope: <strong>lexical <code>this</code></strong>.</p>
+    </li>
+  </ul>
+  <h2 id="objects">Objects</h2>
+  <ul>
+    <li>Better to create them in literal syntax.</li>
+    <li>Six primary types: <code>string</code>, <code>number</code>, <code>boolean</code>, <code>null</code>, <code>undefined</code>, <code>object</code>.</li>
+    <li>Five primitive types (all but object).</li>
+    <li>Built-in objects: <code>String</code>, <code>Number</code>, <code>Boolean</code>, <code>Object</code>, <code>Function</code>, <code>Array</code>, <code>Date</code>, <code>RegExp</code>, <code>Error</code>.</li>
+    <li>&quot;Built-in objects&quot; are all functions. Remember, a function is a sub-type of object.</li>
+    <li>A function is just a callable object.</li>
+    <li>When primitives are used, they are coerced into one of these objects if necessary.</li>
+    <li><code>null</code> and <code>undefined</code> have no wrapper/box.</li>
+    <li><code>Object</code>s, <code>Array</code>s, <code>Function</code>s and <code>RegExp</code>s are always objects</li>
+    <li>Don't use built-in objects as constructors unless the extra functionality they offer is needed.</li>
+    <li>
+      <p>Even properties have properties:</p>
+      <div class="sourceCode"><pre class="sourceCode js"><code class="sourceCode javascript"><span class="va">Object</span>.<span class="at">defineProperty</span>(myObject<span class="op">,</span> <span class="st">&#39;a&#39;</span><span class="op">,</span> <span class="op">{</span>
+                      <span class="dt">value</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span>
+                      <span class="dt">writable</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>
+                      <span class="dt">configurable</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>
+                      <span class="dt">enumberable</span><span class="op">:</span> <span class="kw">true</span>
+                      <span class="op">}</span>)<span class="op">;</span></code></pre></div>
+    </li>
+    <li><code>Object.preventExtensions(myObj);</code></li>
+    <li><code>Object.seal(myObj);</code></li>
+    <li><code>Object.freeze(myObj);</code></li>
+    <li><code>[[Get]]</code> and <code>[[Set]]</code> operations can be modified on a per property basis.</li>
+    <li>Keyword <code>in</code> checks object and prototype chain, for-in loops too!</li>
+    <li>Alternatively, <code>myObj.hasOwnProperty('a');</code> does not follow prototype.</li>
+    <li>
+      <p>For object without prototype, <code>Object.prototype.hasOwnProperty.call(myObj, 'a');</code>.</p>
+    </li>
+  </ul>
+  <h1 id="mixing-up-class-objects">Mixing (Up) &quot;Class&quot; Objects</h1>
+  <h1 id="prototypes">Prototypes</h1>
+  <ul>
+    <li><code>for..in</code> will check entire prototype chain for <code>enumerable</code> properties.</li>
+    <li>The <code>in</code> operator checks entire prototype chain.
+      <br /> Important to understand how assignment is made, scenario: <code>myObject.foo = 'bar';</code> and foo is <strong>not</strong> in <code>myObject</code> but <strong>is</strong> in <code>[[Prototype]]</code> chain.</li>
+  </ul>
+  <ol>
+    <li>Normal data accessor in <code>[[Prototype]]</code> with <code>writable:true</code>, then <code>foo</code> is added to <code>myObject</code>.</li>
+    <li>Normal data accessor with <code>writable:false</code>, error thrown in strict mode.</li>
+    <li><code>foo</code> is found in <code>[[Prototype]]</code> as a setter, runs the setter.
+      <br /> For cases 2 and 3 must use <code>Object.defineProperty</code>.</li>
+  </ol>
+  <ul>
+    <li>No class &quot;blueprints&quot;, <em>there's just the object</em>.</li>
+    <li>All functions (function object) get <code>prototype</code>, &quot;Foo's prototype&quot; --&gt; &quot;the object formerly known as Foo's prototype&quot; === &quot;object arbitrarily labeled 'Foo dot prototype'&quot;.</li>
+    <li>The object <code>prototype</code> is only linked automatically to functions.</li>
+    <li>The prototype chain is just based on a &quot;link&quot; between objects, and some strange behavior comes from the fact that all functions have a <code>prototype</code> object to which all objects created with <code>new Func</code> get linked to.</li>
+    <li>More interestingly still, <code>protoype</code> has <code>prototype.constructor</code> which is a reference to the function itself.</li>
+    <li>Functions aren't constructors, but function calls are &quot;constructor calls&quot; if and only if <code>new</code> is used.</li>
+    <li>At the topmost level of a typical <code>[[Prototype]]</code> chain is one of the built-in function's <code>prototype</code> object.</li>
+    <li>JS is just a language that provides objects and primitive types, callable objects are functions, and the language provides 7 default functions that by default have a prototype and that by default end up creating all objects and functions used. Provides
+      autoboxing for primitives, and a way to have no prototype linked free floating objects.</li>
+    <li>Prototype and constructor properties are just filled in and linked by default, but they are no more special than any other object, and therefore may be just as well overwritten.</li>
+    <li>The concept of prototype is that of a delegation/backup object for properties.</li>
+    <li>Prior to ES6, can't change prototype of an object.</li>
+    <li>
+      <p><code>instanceOf</code> needs object and function. Automatically assumes function has a <code>.prototype</code> and checks to see whether that object that belongs to the function object is in the prototype chain of the object.</p>
+      <div class="sourceCode"><pre class="sourceCode js"><code class="sourceCode javascript">a <span class="kw">instanceof</span> Foo<span class="op">;</span></code></pre></div>
+    </li>
+    <li>
+      <p><code>.isPrototypeOf</code> works with two objects.</p>
+      <div class="sourceCode"><pre class="sourceCode js"><code class="sourceCode javascript"><span class="va">ob1</span>.<span class="at">isPrototypeOf</span>(ob2)<span class="op">;</span></code></pre></div>
+    </li>
+    <li>Basically <code>instanceof</code> of is a particular case of <code>isPrototypeOf</code> that assumes that one of the objects is the <code>prototype</code> property of the supplied function.</li>
+    <li>To access an object's prototype: <code>Object.getPrototypeOf(ob);</code>.</li>
+    <li>
+      <p>If you dont want to jump through function prototype hoops, just use <code>Object.create(..);</code>.</p>
+    </li>
+  </ul>
+  <h2 id="behavior-delegation">Behavior Delegation</h2>
+  <ul>
+    <li>The important functionality to leverage in JavaScript is all about objects being linked to other objects.</li>
+    <li>It is good practice to not rely on links as fallbacks: hard to maintain code. Better to make a property that calls the fallback method to explicitly state that we are relying on prototype linkage as a fallback.</li>
+    <li>Circular linkage references are disallowed.</li>
+    <li>When coding with OLOO (Objects Linked to Other Objects) style, the <em>who</em> &quot;constructed&quot; any given object is an irrelevant detail.</li>
+  </ul>
+
+</body>
+
+</html>

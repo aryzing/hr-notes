@@ -1,8 +1,17 @@
-# Shortcuts and Workflow
-## Atom
+# Atom shortcuts
 Command Palette: `ctrl+shift+p`
 
-## Floobits
+Line manipulation:
+* `ctrl+enter` open new line below current
+* `ctrl+shift+enter` open new line above current
+* `ctrl+shift+k` delete current line
+* `ctrl+shift+d` duplicate line
+
+# Package live HTML view
+* `ctrl+shift+h` open live HTML preview
+
+
+# Package Floobits
 To **create** workspace: from Command Palette, `Floobits: Create Workspace`.
 
 Special to **Hack Reactor**:
