@@ -1,27 +1,3 @@
-# Child selectors
-
-To select children, put two selectors separated by space:
-
-```css
-.selector1 .selector2 {
-  color: blue;
-}
-```
-
-This not only selects all elements "selector2" children of "selector1", but any descendant of "selector". To select direct children, use ">" notation.
-
-```css
-.parent > .child {
-  color: yellow;
-}
-```
-
-Latex stuff:
-
-```latex
-x = 2
-```
-
 # Responsive web design
 
 + flexible layouts
@@ -92,38 +68,3 @@ It seems that desktop browsers don't respect the `viewport` rule. The viewport s
 Embedded media `iframes` may cause responsiveness issues. Solution http://alistapart.com/article/creating-intrinsic-ratios-for-video.
 
 *Revelation!* The order of inclusion of JS files in HTML source matters because it is as if they are all written in one large file, one after another. So if a file contains references to objects (functions, variables) that are defined in a previous file, all is OK. However, if a file uses a reference that is defined in a subsequent file, an error will occur.
-
-The jQuery object:
-
-```javascript
-$();
-jQuery();
-```
-
-All of our code that uses jQuery must be inside the `ready()` method to prevent execution before the document has finished loading.
-
-```javascript
-$(document).ready(function(event) {
-  // code using jQuery
-});
-```
-
-The `$()` function is then used to select nodes for their manipulation:
-
-```javascript
-$(document).ready(function(event) {
-  $('.feature');           // Class selector
-  $('li strong');          // Descendant selector
-  $('em, i');              // Multiple selector
-  $('a[target="_blank"]'); // Attribute selector
-  $('p:nth-child(2)');     // Pseudo-class selector});
-});
-```
-
-To reference the object matched in a selection within a jQuery function, use `this` keyword:
-
-```javascript
-$('div').click(function(event){
-  $(this);
-});
-```
