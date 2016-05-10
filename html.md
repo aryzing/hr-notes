@@ -56,7 +56,7 @@ Element IDs are only useful for:
 # Elements that are "inserted"
 CSS, JS, anchors, images
 * Elements that substitute content use `src`.
-* Elemens contributing to understanding document use `href`.
+* Elements contributing to understanding document use `href`.
 
 For CSS:
 ```html
@@ -66,7 +66,7 @@ For CSS:
 For JS:
 ```html
 <script src="javascript.js"></script>
-<script defer="true" src="javascript.js"></script>
+<script defer src="javascript.js"></script>
 ```
 [Defer vs Async](http://www.growingwiththeweb.com/2014/02/async-vs-defer-attributes.html)
 
@@ -79,3 +79,19 @@ For images:
 ```html
 <img src="picture.png" alt="Alternative text">
 ```
+
+# Boolean attributes
+
+Attributes that take no value. Their declaration within a tag sets them to true:
+
+```html
+<script defer src="script.js"></script> <!-- defer = true -->
+```
+
+# Positioning inline elments after block elements
+
+Can't mix inline and block elements on the same line. If inline elements are siblings to block elements, all consecutive inlines will get bundles into their own block. Example in `playground/inline-after-block`.
+
+# Margin madness
+
+Top and bot margins only accepted on block/inline-block, not inline.

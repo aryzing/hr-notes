@@ -1,3 +1,4 @@
+# jQuery
 The jQuery object:
 
 ```javascript
@@ -5,12 +6,16 @@ $();
 jQuery();
 ```
 
-All of our code that uses jQuery must be inside the `ready()` method to prevent execution before the document has finished loading.
+All of our code that uses jQuery must be inside the `ready()` method to prevent execution before the document has finished loading. Two equivalent approaches:
 
 ```javascript
 $(document).ready(function(event) {
   // code using jQuery
 });
+
+$(function) {
+  //code using jQuery
+};
 ```
 
 The `$()` function is then used to select nodes for their manipulation:
@@ -30,5 +35,90 @@ To reference the object matched in a selection within a jQuery function, use `th
 ```javascript
 $('div').click(function(event){
   $(this);
+});
+```
+
+# Traversing the DOM
+
+Using `find` to filter and traverse is faster than having a longer selector.
+
+```js
+$('.class').find('.class2'); // faster
+// ^Selection     ^Traversal
+
+$('.class .class2'); //slower
+```
+
+With pseudoselectors:
+
+```js
+$('.class').first(); // faster
+//^Selection ^Traversal
+
+$('.class:first'); // slower
+```
+
+Some traversing methods: `first`, `last`, `next`, `prev`, `parent`, `children`, `closest`
+
+Closest starts at the element itself and searches upwards through ancestors. Example with `closest`:
+
+```js
+$(this).closest('.class').next().whatever()
+```
+
+# Create new node without adding it to DOM:
+
+```js
+var node = $('<p>This is the way</p>');
+```
+
+# Insertion methods
+
+```js
+// inserted node as child
+$('.nodeAlreadyInDom').append(node); // make last child
+$('.nodeAlreadyInDom').prepend(node); // make first child
+
+// inserted node as sibling
+$('.nodeAlreadyInDom').before(node); // put 'node' before 'already'
+$('.nodeAlreadyInDom').after(node); // put 'node' after 'already'
+```
+
+Alternative syntax:
+```js
+// inserted node as child
+node.appendTo($('.nodeAlreadyInDom')); // make last child
+node.prependTo($('.nodeAlreadyInDom')); // make first child
+
+// inserted node as sibling
+node.insertBefore($('.nodeAlreadyInDom')); // put 'node' before 'already'
+node.insertAfter($('.nodeAlreadyInDom')); // put 'node' after 'already'
+```
+
+# Deletion
+```js
+$('.bye').remove();
+```
+
+# Event handlers
+
+Event handlers can easily be attached to elements with `on` method
+
+```js
+$('.class').on('click', function thisRuns() {
+  alert(1);
+});
+```
+
+# A note on `this`
+
+In any callback, `this` always points to the DOM element object that originated the callback. That element can be referenced with jQuery by simply wrapping it:
+
+```js
+$(function() {
+  $('button').click(function() {
+    var clickedButton = $(this); // DOM element object converted to jQuery object
+    clickedButton.remove() // jQuery methods can now be used
+  });
 });
 ```

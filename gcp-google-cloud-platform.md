@@ -1,5 +1,3 @@
-
-
 # Google Cloud Platform
 
 [Tutorial](https://cloud.google.com/nodejs/getting-started/hello-world) for creating local Node.js app and "pushing" it to GCP.

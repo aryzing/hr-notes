@@ -45,3 +45,7 @@ To **join** workspace: `Floobits: Join Workspace` also `ctrl-shift-j`.
 
 Special to **Hack Reactor**:
 * Fork repo, but don't clone.
+
+# Package Script
+
+Run code with `ctrl-shift-b`.

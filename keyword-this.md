@@ -1,5 +1,5 @@
 # Keyword `this`
-It is an *auto-bound identifier* intended to refer to some likely-focal object during method or constructor invocation
+It is an *auto-bound identifier* intended to refer to some likely-focal object during method or constructor invocation.
 
 Can be thought of similarly to arguments (formal parameters). You don't know what they evaluate to until runtime.
 
