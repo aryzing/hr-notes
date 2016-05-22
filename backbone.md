@@ -257,3 +257,318 @@ A collection can be an array of anything.
 
 ```js
 var numbers = Backbone.Collection.extend({});
+```
+
+# YouTube video
+[Playlist](https://www.youtube.com/watch?v=4t0n5k0X7ow&index=1&list=PLTjRvDozrdlwn9IsHWEs9IQv3HQob4bH3).
+
+To initialize a model constructor, we extend the backbone model. The initialize function will run whenever a model is instantiated.
+```js
+var Song = Backbone.Model.extend({
+  initialize: function() {
+    console.log("A song has been created.");
+  }
+});
+
+var song = new Song();
+```
+
+## Working with attributes
+Attribute methods:
+```js
+song.set('title', 'Blue in Green');
+
+var title = song.get('title');
+
+var hasTitle = song.has('title');
+
+song.unset('title');
+
+song.clear();
+```
+Attributes can be set in bulk by passing an object to `set` or to the constructor.
+
+We can specify our model to have default attributes:
+```js
+var Song = Backbone.Model.extend({
+  defaults: {
+    gengre: 'Jazz'
+  }
+});
+```
+
+## Validation
+The validate function is run every time properties are set on object. By convention, must return string error message, or nothing (undefined) if there are no errors. The input to the validation function is the instance's attributes.
+```js
+var Song = Backbone.Model.extend({
+  validate: function(attrs) {
+    if (!attrs.title) {
+      return "Title is required";
+    }
+  }
+});
+
+song.isValid(); // true or false
+song.validationError; // Error string returned by validate
+```
+
+## Inheritance
+
+```js
+var Animal = Backbone.Model.extend({
+  walk: function() {
+    console.log('Animal walking...');
+  }
+});
+
+var Dog = Animal.extend({
+  walk: function() {
+    Animal.prototype.walk.apply(this);
+    console.log('Dog walking');
+  }
+});
+
+var dog = new Dog();
+dog.walk();
+```
+
+# Important note on inserting regular objects into a collection
+[StackOverflow post](http://stackoverflow.com/questions/16368455/backbone-js-and-non-model-objects).
+
+Objects doesn't have to be models just because you are using Backbone.
+
+The Backbone Model object is basically just a wrapper around a regular object, that has methods for accessing the data, and events that you can use to subscribe to changes.
+
+If you want to put the objects in a Backbone Collection, then they will be wrapped in models if they aren't already.
+
+# Udemy course on Backbone
+[link](https://www.udemy.com/backbonejs-tutorial/?couponCode=utube).
+
+**Models**: Containers for application data. They have **change tracking mechanism** and **publish events** when their state changes. Can also do ajax.
+
+[Modernizr](https://modernizr.com/) tests user browser's capabilities.
+
+Backbone script dependencies: jquery > underscore > backbone. Before closing body tag.
+
+```js
+// supplied object determines the configuration of the model
+var Song = Backbone.Model.extend({
+  // initialize method called by when creating instance of `Song`
+  initialize: function() {
+    console.log('A new song has been created.');
+  }
+})
+
+var song = new Song();
+```
+
+Backbone models store attributes in a hash, and can not be referenced directly like regular JS objects.
+
+```js
+song.set('title', 'Blue in Green'); // single attribute
+song.set({ // multiple attributes
+  artist: 'Miles Davis',
+  publishYear: 1959
+});
+
+// Alternatively
+var song = new Song({
+  title: 'Blue in Green',
+  artist: 'Miles Davis',
+  year: 1959
+});
+```
+
+If a JSON representation of model is necessary, use
+```js
+var obj = song.toJSON();
+```
+
+Attribute operations:
+```js
+song.set('key', 'val');
+song.get('key');
+song.unset('key'); // removes attribute
+song.clear(); // removes all attributes
+song.has('key'); // boolean has attribute key?
+```
+
+To set default attributes on models, use `defaults` property when extending model:
+
+```js
+var Song = Backbone.Model.extend({
+  defaults: {
+    genre: 'Jazz'
+  }
+});
+```
+
+## Validation
+
+Validation function on model extension receives model attributes. Function should **return string on error detection**.
+```js
+var Song = Backbone.Model.extend({
+  validate: function(attrs) {
+    if (!attrs.title) {
+      return "Title is required";
+    }
+  }
+})
+
+var song = new Song();
+
+song.isValid() // false
+song.validationError // Title is required
+```
+
+## Inheritance
+
+Properties defined when extending `Model` will be in prototype of instances.
+
+Properties defined when creating instances will be attributes of those models.
+
+Inheritance is achieved by extending models
+```js
+var Animal = Backbone.Model.extend({
+  walk: function() {
+    console.log("Animal walking...");
+  }
+});
+
+var Dog = Animal.extend({
+  walk: function() {
+    Animal.prototype.walk();
+    console.log("Animal is a dog");
+  }
+});
+
+var dog = new Dog();
+
+dog.walk(); // animal walking
+```
+
+**Note** If the `walk` method on `Animal` operated on `this`, then `Dog`'s `walk` would need to `apply(this)`.
+
+## Connecting to the Server
+
+Three operations to sync with server:
+```js
+fetch() // GET
+save() // POST / PUT
+destroy() // DELETE
+```
+
+Backbone relies on the `urlRoot` property to know a model's endpoint:
+```js
+var Song = Backbone.Model.extend({
+  urlRoot: '/api/songs'
+});
+```
+
+Example: retrieving a song from server
+```js
+var song = new Song({id: 1});
+song.fetch();
+// GET /api/songs/1
+```
+Will issue a `GET` request because only setting and `id` is not considered modyfing an object. So it will consult the server for the rest of the properties of this instance.
+
+Example: saving a modified model
+```js
+var song = new Song({id: 1});
+song.fetch();
+
+song.set('title', 'New Title');
+song.save();
+// PUT /api/songs/1
+```
+
+Example: creating a new model
+```js
+var song = new Song();
+song.set('title', 'Title');
+song.save();
+// POST /api/songs
+```
+
+Example: deleting a model
+```js
+var song = new Song({id: 1});
+song.destroy();
+// DELETE /api/songs/1
+```
+
+The attribute that uniquely identifies models is `id` by default, but can be changed with:
+```js
+var Song = Backbone.Model.extend({
+  idAttribute: "songId"
+});
+
+var song = new Song({songId: 1});
+```
+
+These methods are async and accept two callbacks:
+```js
+var song = new Song();
+
+song.fetch({
+  success: function() {/*...*/},
+  error: function() {/*...*/}
+});
+```
+
+Note that `save` takes two arguments:
+```js
+var song = new Song();
+
+song.save({/* attributes */}, {
+  success: function() {/*...*/},
+  error: function() {/*...*/}
+});
+```
+
+# Collections
+
+## Creating Collections
+
+Extend `Collection` and specify the type of model it can hold:
+```js
+var Song = Backbone.Model.extend();
+var Songs = Backbone.Collection.extend({
+  model: Song
+});
+```
+
+Can add models to a collection at instantiation or with `add`:
+```js
+var songs = new Songs([
+  new Song({title: 'title1'}),
+  new Song({title: 'title2'}),
+  new Song({title: 'title3'})
+]);
+
+songs.add(Song({title: 'title4'}));
+```
+
+Note: `add` is an underscore function.
+
+The collections object has a `length` property and a `models` property.
+
+Elements in a collection can be referenced with `at()`: returns the model *at* argument position.
+
+All models have two ids: `cid`, client id, and the primary or persistant `id`.
+
+Specific models can be retrieved from a collection with either id:
+```js
+songs.get('c1');
+```
+
+Models may be removed with `remove`. Expects model as argument:
+```js
+songs.remove(songs.at(0));
+```
+
+
+
+# Todo tutorial
+http://backbonejs.org/docs/todos.html

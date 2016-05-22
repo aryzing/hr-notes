@@ -3,7 +3,6 @@
 
 # An array of React elements can be inserted into JSX tags
 Just make sure to give each of them a unique key:
-Example 1:
 ```js
 class Inner extends React.Component {
   render() {
@@ -35,7 +34,23 @@ JSX attributes must either be strings or an expression enclosed in braces:
 <Chat user="Bernard" max-history={settings.user.histLength} />
 ```
 
-# Differences between functions and classes in React
+# Differences between using functions and classes in React
+Technically classes are functions, but you are not allowed to run them. In react, when using JSX, to use a regular function as a component, it must return `createElement`s.
+
+```js
+// function that returns a component
+var A = () => (
+  <div>
+    <p>Test</p>
+    <p>Moar</p>
+  <div/>
+);
+
+// can be rendered as is
+ReactDOM.render(<A />, document.getElementById('app'));
+
+// <El /> are function objects
+```
 
 # Some reasoning
 In the examples, they only use variables that are extended classes from `React.createClass`, yet we used normal functions that just return React components.
@@ -56,22 +71,7 @@ What if I have a class that does not extend React component? Hypothesis: as long
 Indeed, it *works*, but React issues a **warning** asking you to please `extend` `Reactor.Component`.
 
 # State
-Reactor components may have a `state` property that can be updated with a conveniently provided `setState` method.
-
-```js
-// function that returns a component
-var A = () => (
-  <div>
-    <p>Test</p>
-    <p>Moar</p>
-  <div/>
-);
-
-// can be rendered as is
-ReactDOM.render(<A />, document.getElementById('app'));
-
-// <El /> are function objects
-```
+React components may have a `state` property that can be updated with a conveniently provided `setState` method.
 
 # Insight
 
@@ -147,7 +147,5 @@ So what the blog post suggests is to have all data, the "source of truth" outsid
 Does this guy only set state? Never reads state? Yes he does, find out where.
 
 Note: `state` and `props` are bound to the component instance.
-
-Diana is awesome. She goes beyond providing a room: she cares for her guests. The house is spacious and in a quiet area. Ideal for studying. There are plenty of nearby restaurants.
 
 Note: `onChange` is attached to elements: the parent attaches "on change" events to children. A component can't define itself in the prototype an "on change" handler for itself.

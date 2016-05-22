@@ -26,6 +26,8 @@ npm install -g babel-cli
 Local install:
 ```sh
 $ npm install <package_name>
+$ npm install -S <package_name> # save
+$ npm install -D <package_name> # save as dev dependency
 ```
 
 All packages installed will be stored in `node_modules`
@@ -73,3 +75,10 @@ var color = 'green';
 module.exports.color = color; // this line ...
 export color;                 // ... and this one are equivalent
 ``` -->
+
+# Package.json
+You can [specify the version of node](https://docs.npmjs.com/files/package.json#engines) to run:
+
+```js
+{ "engines" : { "node" : ">=0.10.3 <0.12" } }
+```

@@ -95,3 +95,9 @@ Can't mix inline and block elements on the same line. If inline elements are sib
 # Margin madness
 
 Top and bot margins only accepted on block/inline-block, not inline.
+
+# Stopping favicon requests
+
+```html
+<link rel="shortcut icon" href="#" />
+```
