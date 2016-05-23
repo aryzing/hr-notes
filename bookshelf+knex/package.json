@@ -1,0 +1,15 @@
+{
+  "name": "test",
+  "version": "0.0.1",
+  "description": "test",
+  "main": "index.js",
+  "repository": "",
+  "license": "Proprietary",
+  "private": true,
+  "dependencies": {
+    "bluebird": "latest",
+    "bookshelf": "latest",
+    "knex": "latest",
+    "sqlite3": "latest"
+  }
+}
