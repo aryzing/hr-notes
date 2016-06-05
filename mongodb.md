@@ -30,3 +30,7 @@ use db
 A database need not be "declared" before using it. Mongo will create it if necessary upon use.
 
 After issuing a `use` command, `db` will point to the database.
+
+# Using mongodb Node driver
+
+https://docs.mongodb.com/getting-started/node/insert/

@@ -105,3 +105,26 @@ app.get('/logout', function(req, res, next) {
 ```
 
 It is usually not necessary to extend the cookie timeout of sessions manually. They are automatically `touch`ed when they are seen again. I guess the only thing needed to learn is how to set up a session upon user authentication.
+
+# Middleware functions by number of arguments
+Two arguments: `req`, `res`:
+```js
+function (req, res) {/*...*/}
+```
+
+Three arguments: `req`, `res`, `next`:
+```js
+function (req, res, next) {
+  //...
+  next();
+}
+```
+
+Four arguments: `err`, `req`, `res`, `next`:
+```js
+function (err, req, res, next) {
+  if (err) {
+    // handle error
+  }
+}
+```

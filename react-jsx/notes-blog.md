@@ -1,5 +1,7 @@
 # Transpile command
-`babel . --out-dir compiled --presets=es2015,react --ignore=node_modules,compiled --source-maps inline`
+```sh
+babel path/to/source --out-dir path/to/target --presets=es2015,react --ignore=node_modules,compiled --source-maps inline --watch
+```
 
 # An array of React elements can be inserted into JSX tags
 Just make sure to give each of them a unique key:
@@ -39,11 +41,11 @@ Technically classes are functions, but you are not allowed to run them. In react
 
 ```js
 // function that returns a component
-var A = () => (
+var A = (props) => (
   <div>
     <p>Test</p>
     <p>Moar</p>
-  <div/>
+  </div>
 );
 
 // can be rendered as is

@@ -24,12 +24,36 @@ A join table can be thought of as X,Y coordinates of relationships.
 
 # Installation Ubuntu
 ```sh
-sudo apt-get install mysql
+# option 1
+sudo apt-get install mysql-server
+```
+
+```sh
+# option 2. Excessively secure for HR sprints
+sudo apt-get install mysql-server mysql-client
+sudo mysql_secure_installation
+```
+
+To **completely remove** mysql [post](http://stackoverflow.com/questions/10853004/removing-mysql-5-5-completely):
+```sh
+sudo service mysql stop  #or mysqld
+sudo killall -9 mysql
+sudo killall -9 mysqld
+sudo apt-get remove --purge mysql-server mysql-client mysql-common
+sudo apt-get autoremove
+sudo apt-get autoclean
+sudo deluser mysql
+sudo rm -rf /var/lib/mysql
+sudo apt-get purge mysql-server-core-5.5
+sudo apt-get purge mysql-client-core-5.5
+sudo rm -rf /var/log/mysql
+sudo rm -rf /etc/mysql
 ```
 
 If during install a password was set for root, append `-p` to access mysql:
 ```sh
 mysql -u root -p
+sudo mysql
 ```
 
 # SQL Tutorial
@@ -47,7 +71,7 @@ CREATE DATABASE Company;
 USE Company;
 
 
-CREATE TABLE employees (
+CREATE TABLE Employees (
   first varchar(15),
   last varchar(20),
   title varchar(50),
@@ -75,13 +99,13 @@ select * from employees;
 
 Commands for showing tables and databases
 ```sh
-show tables;
-show databases;
+SHOW tables;
+SHOW databases;
 ```
 
 To find info about a given table:
 ```sh
-desdribe employees
+DESCRIBE employees
 ```
 
 Command syntax
@@ -121,7 +145,8 @@ select * from employees;
 ```
 Select all columns for everyone with a salary over 30000.
 ```sql
-select * from employees where salary > 30000;
+SELECT * FROM Employees
+  WHERE salary > 30000;
 ```
 Select first and last names for everyone that's under 30 years old.
 ```sql
@@ -129,7 +154,8 @@ select first, last from employees where age < 30;
 ```
 Select first name, last name, and salary for anyone with "Programmer" in their title.
 ```sql
-select first, last, salary from employees where title like '%Programmer%';
+SELECT first, last, salary FROM employees
+  WHERE title like '%Programmer%';
 ```
 Select all columns for everyone whose last name contains "ebe".
 ```sql

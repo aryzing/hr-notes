@@ -47,5 +47,6 @@ Special to **Hack Reactor**:
 * Fork repo, but don't clone.
 
 # Package Script
+[script](https://atom.io/packages/script).
 
 Run code with `ctrl-shift-b`.
