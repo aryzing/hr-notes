@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app"> <!-- Don't forget `ng-app`!!! -->
+<head></head>
+
+<body ng-controller="MainController">
+  <!-- create variable, assign value with `ng-init`-->
+  <!-- <section class="demo" ng-init="todos=[]"> -->
+  <section class="demo">
+    <input type="text" class="search-input" ng-model="search">
+    <input type="text" class="todo-input" ng-model="newTodo">
+    <button ng-click="addTodo(newTodo); newTodo='';">add</button>
+    <ul>
+      <!-- <li ng-repeat="todo in todos track by $index" ng-click="done($index)">
+        {{$index}}, {{todo.title}}
+      </li> -->
+      <div ng-repeat="todo in todos | filter:search track by $index" ng-click="done($index)">
+        {{$index + 1}}. {{todo.title}}
+      </div>
+      <h3 ng-if="todos.length < 1">All tasks complete</h3>
+
+    </ul>
+  </section>
+
+  <section class="code">
+    <pre>{{todos | json}}</pre>
+  </section>
+  <script src="node_modules/angular/angular.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
