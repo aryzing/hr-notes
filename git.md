@@ -168,3 +168,6 @@ Understanding triangle like graph topology on github when PR is accepted:
 * Must then rebase upstream, and force push to your repo => git will not auto-update PR.
 
 * No point in cloning. All objects get pulled down with fetch. Only necessary to `cob` on upstream/master and work away. Push to your repo and PR.
+
+# Hard Reset
+[Post](http://stackoverflow.com/questions/9210446/replace-local-branch-with-remote-branch-entirely).

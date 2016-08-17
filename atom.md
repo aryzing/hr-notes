@@ -50,3 +50,10 @@ Special to **Hack Reactor**:
 [script](https://atom.io/packages/script).
 
 Run code with `ctrl-shift-b`.
+
+# Package list:
+* `atom-beautify`
+* `git-plus`
+* `merge-conflicts`
+* `react`
+* `script`

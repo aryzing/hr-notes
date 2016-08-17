@@ -20,7 +20,7 @@ app.post('/register', (req, res) => {
   // ... store user info in db
 
   // create token for this user
-  var token = jwt({username}, SECRET)
+  var token = jwt.sign({username}, SECRET)
 
   // create object to send back
   var responseBody = {token};

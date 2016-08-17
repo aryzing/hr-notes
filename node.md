@@ -18,8 +18,10 @@ npm install -g live-server
 npm install -g nodemon
 npm install -g bower
 npm install -g babel-cli
-```
+npm install -g webpack
 
+npm i -g node-inspector live-server nodemon bower babel-cli webpack
+```
 
 # Installation of modules
 
@@ -82,3 +84,34 @@ You can [specify the version of node](https://docs.npmjs.com/files/package.json#
 ```js
 { "engines" : { "node" : ">=0.10.3 <0.12" } }
 ```
+
+# Running scripts
+File `package.json` allows for named scripts. Some names have special meaning and tie directly into npm.
+
+To run a custom script, give it a non-special name and execute it with
+```sh
+npm run <script>
+```
+
+# npm locally installed executables vs global installs
+http://www.2ality.com/2016/01/locally-installed-npm-executables.html
+Packages can be installed globally or locally.
+
+Globally means that a command is made available (globally) to execute that package. Therefore, a binary is put somewhere and the directory containing the binary is somewhere in you $PATH.
+
+Locally means that a package is installed in a node_modules folder. Packages installed locally may have binaries (in fact, they are the same exact packages installed globally). However, the binary is not in $PATH so can't be directly invoked from command line.
+
+Same package installed globally and locally. If has binary:
+* Global install will make binary available as command in CLI, will not make package available for import in source code.
+* Local install will only make package available for importation in source code, but will not make any binary it has directly available in CLI
+
+Note that npm packages may or may not contain Node.js modules.
+
+Some packages come with executables. Executables are just plain .js files that are intended to be run in terminal and provide no exports. What makes them executables is this, no exports and written to be run in terminal, and not that they are a binary file or some compiled file (because they are not). They have a shell header:
+
+`#!/usr/bin/env node`
+
+Also, it seems that within scripts, references to node_module packages that provide binaries are searched for in `node_modules`.
+
+## Running executables from nearby node_modules
+The

@@ -67,3 +67,20 @@ To recap:
 * No static data on class definitions
 * Methods, getters, and setters are attached to `prototype`.
 * `static` methods are attached to the function object.
+
+# Object syntax
+The code
+```js
+var a = {
+  print() {console.log("hello");}
+};
+```
+
+is equivalent to
+```js
+var a = {
+  print: function print() {
+    console.log("hello");
+  }
+};
+```
