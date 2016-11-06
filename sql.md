@@ -70,7 +70,6 @@ CREATE DATABASE Company;
 
 USE Company;
 
-
 CREATE TABLE Employees (
   first varchar(15),
   last varchar(20),

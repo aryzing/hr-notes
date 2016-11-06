@@ -107,6 +107,8 @@ Four different `position` values: \*`static`, `relative`, `fixed`, `absolute`.
 
 **Absolute**: positioned according to it's nearest relatively positioned ancestor. Same `top`, `right`, `bottom`, and `left`properties apply. They are removed from the normal flow. Creates new coord system.
 
+When positioning an absolute inside a relative, the coordinates used by the absolute are the *padding* bounding box of its relative ancestor. [See post][http://stackoverflow.com/questions/17115344/absolute-positioning-ignoring-padding-of-parent].
+
 # Media queries
 
 Boilerplate code for html for media queries:
@@ -143,3 +145,15 @@ Media query definitions surround the rules that become active when the condition
 ![min and max width cascading][graph]
 
 [graph]: max-and-min-cascading.jpg
+
+# Imports
+
+Imports, `@import`, are used to import other stylesheets. **Must be at the very beginning of style sheet**.
+
+[MDN @import][https://developer.mozilla.org/en-US/docs/Web/CSS/@import]. There are no examples with http urls in a string, but they are an option too.
+
+```css
+@import 'https://fonts.googleapis.com/css?family=Roboto+Mono';
+```
+
+Note that a string is used without enclosing it `url()`.

@@ -1,6 +1,6 @@
 # Bash intro
 
-Bash stands for Bourne Again SHell. It is a command line interpreter.
+Bash is a command line interpreter. Bash stands for Bourne Again SHell.
 
 The first thing we can do is get the version of bash we're using with
 
@@ -41,7 +41,7 @@ man ls
 man pwd
 ```
 
-  * Man pages are displayed with a viewer program called `less`. Press `h` to view all options.
+* Man pages are displayed with a viewer program called `less`. Press `h` to view all options.
 
 * `mkdir` create directory.
 
@@ -50,6 +50,7 @@ man pwd
 * `cp` copy file
 
 * `rm` remove file
+
 ```sh
 mkdir docs
 rmdir docs #must be empty to be removed
@@ -72,11 +73,12 @@ rm bye.txt
 # Tilde and Brace Expansion
 
 There are variables available called `$HOME`, `$PWD`, and `$OLDPWD` (previous dir we were in).
-`pwd` prints value of `$PWD`.
-`~` expands to value of `$HOME`, `~+` expands to $PWD, and `~-` expands to $OLDPWD.
-This is called tilde expansion.
 
-Brace expansion expands comma separated values or ranges onto previous arguments.
+`pwd` prints value of `$PWD`.
+
+`~` expands to value of `$HOME`, `~+` expands to $PWD, and `~-` expands to $OLDPWD. This is called **tilde expansion**.
+
+**Brace expansion** expands comma separated values or ranges onto previous arguments.
 
 ```sh
 touch {a,b,c} #creates files a, b, and c.
@@ -93,9 +95,9 @@ Questions:
 * Result of `touch {a,b}{c,}`?
 * Result of `touch {a,b}c`?
 
-**Comment to self**: commands are just text strings interpreted by bash. Certain characters have special meaning. For example, braces cause their contents to be expanded into the command string itself separated by spaces. 
+**Comment to self**: commands are just text strings interpreted by bash. Certain characters have special meaning. For example, braces cause their contents to be expanded into the command string itself separated by spaces.
 
-So ther isn't much point to doing something like `touch {fileA,fileB,fileC}` because it expands to `touch fileA fileB fileC`. It can be said that `touch a b c` is the **resulting command string** of `touch {a,b,c}`. 
+So ther isn't much point to doing something like `touch {fileA,fileB,fileC}` because it expands to `touch fileA fileB fileC`. It can be said that `touch a b c` is the **resulting command string** of `touch {a,b,c}`.
 
 Note that the expansion is attached to the surrounding characters:
 
@@ -110,10 +112,10 @@ echo start_{b,c}{d,e}_end
 Braces can also process ranges, including steps.
 
 ```sh
-echo {1..7} 
-#1 2 3 4 5 6 7 
+echo {1..7}
+#1 2 3 4 5 6 7
 
-echo {01..100} 
+echo {01..100}
 #numbers 1 through 100 with leading zeros.
 #001 002 003 [...] 063 064 [...] 100
 
@@ -180,7 +182,7 @@ ping -c 1 example.com | grep 'bytes from' | cut -d = -f 4
 # comment
 ```
 
-* A script may be executed by bash by using a script's path as an argument to `bash`, i.e. `bash my.sh`. 
+* A script may be executed by bash by using a script's path as an argument to `bash`, i.e. `bash my.sh`.
 * If the script has a shebang line and it is marked as executable, there is no need to give a program name to execute the script.
 * For a script to be executed, it's directory must be in `$PATH`.
 * Directory `/usr/bin` is always in `$PATH`.
@@ -208,7 +210,7 @@ echo "$greeting, world \(planet\)!"
 
 So this part of the video tutorial was more of an excuse to learn about the different ways that statements get processed and how quotes affect them.
 
-Also, I have discovered that the space can be kind of a command delimiter. For example, if a previous group of characters are considered to be finished, then a space character will give way to a new command. For example, compare 
+Also, I have discovered that the space can be kind of a command delimiter. For example, if a previous group of characters are considered to be finished, then a space character will give way to a new command. For example, compare
 
 ```sh
 echo hi ls
@@ -218,7 +220,7 @@ a=hi ls
 # assigns hi to a and then lists pwd
 ```
 
-Since echo is an infinite argument command, everything after it separated by spaces are considered arguments. 
+Since echo is an infinite argument command, everything after it separated by spaces are considered arguments.
 
 Space is indeed a special separator character. Consider
 
@@ -283,9 +285,53 @@ Logic operators: `&&`, `||`, and `!`.
 
 To test for null string, use `-z` (is null?) or `-n` (is not null?).
 
+# Strings
 
+Concatenation: just put two variables right next to each other.
 
+```sh
+a=hello
+b=world
+c=$a$b  # helloworld
+```
 
+String length obtained with `${#var}`
+
+```sh
+echo ${#a}  # 5
+echo ${#c}  # 10
+```
+
+Sub strings:
+
+```sh
+a=house
+echo ${a:2}      # slice from char at index 2 onwards: use
+echo ${a:1:2}    # slice fom char at index 1 and next 2 chars: ou
+ecoh ${a: -4:4}  # slice from 4th char from end, for next 4 chars: ouse.
+                 # must leave space before `-` sign
+```
+
+String substitution
+
+```sh
+echo ${variable/search/substitute}   # substitutes first instance
+echo ${variable//search/substitute}  # substitutes all instances
+echo ${variable/#search/substitute}  # replace only if at beginning of string
+echo ${variable/%search/substitute}  # replace only if at end of string
+echo ${variable/sea*/substitute}     # replace if matches `sea*` (wildcard)
+```
+
+# Text styling
+
+```sh
+echo -e "\033[34;42mColor Text\033[0m"
+```
+
+* `-e` escaped string.
+* Example escaped sequence: `\033[34;42m`.
+* `m` indicates end of escaped sequence.
+* The numbers correspond to colored text options.
 
 
 
@@ -294,6 +340,8 @@ To test for null string, use `-z` (is null?) or `-n` (is not null?).
 
 
 # Useful links
+
+[Bash home page][bash].
 
 [Chet Ramey's BASH website][1].
 
@@ -307,9 +355,13 @@ To test for null string, use `-z` (is null?) or `-n` (is not null?).
 
 [Bash internal variables][6].
 
+[Bash colors (ANSI escape codes)][7].
+
+[bash][https://www.gnu.org/software/bash/]
 [1][http://tiswww.case.edu/php/chet/bash/bashtop.html]
 [2][http://tiswww.case.edu/php/chet/bash/bashref.html#SEC137]
 [3][https://www.gnu.org/software/bash/manual/html_node/Tilde-Expansion.html]
 [4][http://askubuntu.com/questions/172982/what-is-the-difference-between-redirection-and-pipe]
 [5][http://stackoverflow.com/questions/2342826/how-to-pipe-stderr-and-not-stdout]
 [6][http://tldp.org/LDP/abs/html/internalvariables.html]
+[7][https://en.wikipedia.org/wiki/ANSI_escape_code]
