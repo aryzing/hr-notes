@@ -248,9 +248,374 @@ Summary. Not necessarily in this order, but this is so far what I have done:
 * Create saga that actually performs what I waant
 * Create listener saga
 
+I'm surprised that we have to  "bootstrap" the generators. I wonder if it's because I'm not understanding the yielding mechanism properly.
 
+As I understand it now, the body of a generator function executes up to the yield *and* "returns" (to the generator's `.next()`) its value. Perhaps, the body executes up to the yield, but only returns the value at the "beginning of the execution". Lets try it out.
+
+```js
+function* gen () {
+  console.log('I have started executing');
+  yield 1;
+  console.log('After 1');
+  yield 2;
+  console.log('After 2');
+}
+
+var g = gen();
+
+console.log('Starting');
+console.log(g.next().value);
+console.log('After A');
+console.log(g.next().value);
+console.log('After B');
+console.log(g.next().value);
+console.log('After C');
+console.log(g.next().value);
+console.log('After D');
+```
+
+Nope. My mental model was correct. It works as I understood it the first time. That is, the function only runs when a generator object created from it has its `.next()` method called. It runs up to and including the yield expression, and the value of that expression is what is accessible via the `.value` property.
+
+Although not strictly related to sagas, I will now test what happens when we have two generator objects created form the same function. I believe that there will be two different execution contexts. Lets see.
+
+```js
+function* gen () {
+  console.log('I have started executing');
+  yield 1;
+  console.log('After 1');
+  yield 2;
+  console.log('After 2');
+}
+
+var g = gen();
+var h = gen();
+
+console.log(g.next().value); // 1
+console.log(h.next().value); // 1
+```
+
+Testing
+
+Recommended testing practice, my opinions on it.
+
+Ok, so, when testing, what we are testing are the yielded values of the generators. Depending on what is he yielded value, it can be easier or harder to test for it.
+
+For example, if it returns a primitive value (string, number, undefined, ...) it is easy to test for. If it returns something a bit more complicated, like an object, it is harder, but still doable.
+
+However, what if we are returning a "Promise that resolves after 1 second" !!!. How in the hell are we going to test for that? Moreover, we, the developer, have created this Promise through a `redux-saga` utility and have no idea how this was done.
+
+So, specifically to be able to test easily, `redux-saga` has introduced intermediary functions called *effects* that describe what is about to happen. These effects are functions that  return objects that describe what is about to happen.
+
+Objects are not the easiest of things to test against, but can be feasable using a deepequals library.
+
+To get these easy to test objects, we already must build the generator functions with testing in mind, such as:
+
+```js
+import { put, call } from 'redux-saga/effects';
+import { delay } from 'redux-saga';
+
+export function* incrementAsync() {
+  yield call(delay, 1000); // --> {CALL: {fn: delay, args: [1000]}}
+  yield put({type: 'INCREMENT'}); // --> {PUT: {type: 'INCREMENT'}}
+}
+```
+
+Moreover, we don't even have to write out the objects in the tests, we can use the very same function calls in the yield expressions to produce them, and then use a deepequals library.
+
+Conceptually, this looks something like:
+
+* Create the generators using the functions that instruct the operations to take place by returning descriptive objects.
+* I believe that when calling a function, since its name is received in plain text, it must know interpret the function name to correspond to one in the `redux-saga` library. ASIDE
+* In the tests, use a deep equals library in conjuction with the the imported `redux-saga` effects that produce the objects.
+* Test any other value normally.
+
+Ok, up to here I can understand this too. But now, how does it work with async calls to the server?
+
+We will get into an example shortly, first, there are two versions of defining the root saga: yielding an array of the saga watchers or creating a root saga with one yield per watcher.
+
+The two main saga middlewaare processing mdoes are
+
+* `takeEvery`
+* `takeLatest`
+
+Saga = Generator > yield POJO aka *Effect*.
+
+Can the middleware accept other values, or POJOs that dont give it specific instructions? Is there even a point doing that?
+
+> To create Effects, you use functions provided by the library in the `redux-saga/effects` package.
+
+A popular yielded effect is a Promise. Promises play well with generators and Sagas. I am seeing similarities b/w yielding and promises, I wonder if they are constructed atop the same underlying code.
+
+Again: sagas middleware is prepared to receive promises: it does not call `.next()` until they are resolved. So, AJAX APIs  that return promises are ideal candidates to use with  Sagas.
+
+But earlier we already saw that it was hard to test against Promises. If the promises were produced by tools within `redux-saga`, then that's no problem, because the library provides wrapper functions that return POJOs. But what happens when the promises are from other libraries external to `redux-saga` like `axios`?
+
+Well, we don't actually test "thoroughly", instead all we do is test whether the api call is instructed to be made and that the arguments are correct.
+
+```js
+import Api from 'path/to/api'
+import { call } from 'redux-saga/effects'
+
+function* fetchProducts() {
+  const products = yield call(Api.fetch, '/products', arg2, arg3, /* ... */ argN);
+}
+```
+
+`call` will return an object that looks like
+
+```js
+{
+  CALL: {
+    fn: Api.fetch,
+    args: ['./products']
+  }
+}
+```
+
+So, the point it to deepequals test this object, and call it a day if it matches. Theres no testing that the call actually ocurred.
+
+This uses the philosophy that we test that the function is written to do what we want. Later, we can test that the response gets processed correctly in a different test. But there is no all-encompassing tests the complete flow.
+
+With this approach, we are relying that the person responsible for the descriptor function has thoroughly tested it and that it works. I have my reservations on the approach, but it does make it so that the package that each function comes from is the one responsible for its correct behavior. By testing the complete flow, we are perhaps testing more that what is required.
+
+To provide a context, we can use the effects:
+* `yield call([obj, obj.method], arg1, arg2, /*...*/ argN)`
+* `yield apply(obj, obj.method, [arg1, arg2, /*...*/ argN])`
+
+CPS (Continuation Passing Style) supported with `cps` aka Node error-first callbacks.
+
+
+
+
+
+
+
+
+Lets do a brief recap of what I remember from iterables, iterators, and generators.
+
+An object can be made iterable by defining its `@@iterator` method.
+
+This method is a function that returns an object with a `next()` method, that returns an object with two keys: `done` and `value`.
+
+Generators: generator functions and generator objects. The objects are the iterators of the function, meaning they have a `.next()` method. The value of the object returned is computed in the generator function body.
+
+```js
+function* gen() {
+  var i = 0;
+  while (true) {
+    console.log(`before yield: ${value}`);
+    var value = yield i;
+    console.log(`after yield: ${value}`);
+    i++;
+  }
+}
+
+var g = gen();
+
+var result;
+
+result = g.next();
+// before yield: undefined
+// {value: 0, done: false}
+
+result = g.next();
+// after yield: undefined <-- wtf?
+// before yield: undefined <-- wtf?
+// {value: 1, done: false}
+
+result = g.next();
+// after yield: undefined <-- wtf?
+// before yield: undefined <-- wtf?
+// {value: 2, done: false}
+
+result = g.next('hello');
+// after yield: hello
+// before yield: hello
+// {value: 3, done: false}
+
+result = g.next();
+// after yield: undefined
+// before yield: undefined
+// {value: 4, done: false}
+```
+
+With this we conclude that the yield expression evaluates to undefined. Do not confuse the yield expression with the expression that is the argument of the yield operator.
+
+You can assign a value to the yield expression by passing that value in the `.next(value)` method.
+
+Because `.next()` method is inspired from an iterable object, I wonder what happens if this method is called on an iterator that does not come from a generator, that is, one that is the result of defining `@@iterator`.
+
+I believe that under this scenario, you could define what happens to the incoming argument. Most language constructs will continue to call it without an argument, such as `for..of` or the `...spread` operator.
+
+Thank me, this was necessary.
+
+
+
+
+
+
+
+
+
+Now I can continue, and in fact understand, what it means to mock the following products.
+
+```js
+function* fetchProducts() {
+  const products = yield call(Api.fetch, '/products');
+  yield put({type: 'PRODUCTS_RECEIVED', products})
+}
+```
+
+Mocking a response is so easy! All you have to do is provide the value of the products as the value of the yield expression using `.next(products)`.
+
+important: so the behavior of Saga, is that when a generator yields a promise, it calls `.next(resultOfPromise)`, and that is why we can expect to have the result of a promise be the value of the yield expression. amazing.
+
+Truly, what matters, is how the library consuming generators uses the `.next()` method.
+
+In other words, previously I didn't really know how the value of the Promise made its way to the assigned variable when going through Saga, I never made the connection. Now it's clear how that happens.
+
+Going back to the philosophical debate I was having earlier. What the author of Sagas proposes is that each package test its own functions. While this seems sound, there is some redundancy lost when testing an entire workflow. Which means, that it might be harder to detect a non-working function from a package. Will meditate more later.
+
+QUESTION: what are exactly the rules Saga uses to assign an object value to a yielded function that returns a Promise.
+
+Something to remember: Well, what yield expression argument can Saga consume? It can consume
+
+* a Promise (remember `delay()`)
+* an Effect (a function that tells it what to do)
+* the Effect can be a function that returns a promise
+* can the call effect consume a function other than one that returns a promise?
+
+## Advanced Sagas
+
+Up to this point I have more or less understood most of what I have read. But now I am becoming saturated. Why? My knowledge of generators is recent and not always at 100%. Also, I am not entirely familiar with how Saga consumes generators. For example, I don't understand how it is able to consume one, or a root with several yielded, or a root with a single yield of an array.
+
+I have already proved myself that my understanding was not perfect with the case of passing values to next. However, after having solved that issue, lets assume that now I'm in a good enough shape.
+
+The next hurdle, then, understanding how the Saga consumes generators which are listeners, and how these work to call other generators.
+
+```js
+// style 1 - single function
+sagaMiddleware.run(function* gen () {
+  console.log('hi');
+});
+// style 2 - root with single yield
+function* genW1 () {
+  yield takeEvery('AT', gen1)
+}
+sagaMiddleware.run(function* rootGen () {
+  yield [
+    genW1(), // g1. This is a watcher.
+    genW2(), // g2. This is a watcher.
+  ];
+});
+// style 3 - root with multiple yields
+sagaMiddleware.run(function* rootGen () {
+  yield takeEvery('AT1', gen1);
+  yield takeEvery('AT2', gen2);
+});
+```
+
+Now I'm beginning to see that it makes sense to initialize the root generator/saga with `.run(rootSaga)`. I believe this causes the Saga library to run through everything and configure itself to listen for whatever it needs to. There doesn't seem to be logic that would require this generator to run more than once after everything is configured. Having declared the watchers, what does get run whenever an action is dispatched are the `genX` for which there are watchers.
+
+* `genWX` runs once to configure middleware.
+* `genX` runs on each matched watcher.
+
+The only two things I need to finally nail are the rules governing the watchers (how to set them up) and the "watched" generators (how to use them with Effects, Promises, patterns, control flow, etc). In the latter is where I believe greatly understanding generators will be necessary.
+
+Starting from the Beginner Tutorial again.
+
+The terms used to distinguish the role of generators are **worker saga** and **watcher saga**.
+
+> Sagas are implemented as Generator functions that *yield* objects to the redux-saga middleware.
+
+Can also yield Promises. Waits for them to finish before continuing.
+
+> Effects are POJOs which contain instructions to be fulfilled by the middleware.
+
+Ok, then don't call the functions that return them Effects too. I guess they could be called Effect Creators.
+
+> [...] `rootSaga` [...] is responsible for starting our other Sagas.
+
+Responsible for starting watcher sagas.
+
+```js
+function* root () {
+  // yielded array makes all start in parallel.
+  yield [
+    watcher1(), // gWatcher1
+    watcher2(), // gWatcher2
+    watcherN()  // gWatcher3
+  ];
+}
+```
+
+> Instead of doing yield delay(1000), we're now doing yield call(delay, 1000). What's the difference?
+
+Using a yielded expression that evaluates to an object (Effect) or a Promise. Nothing special related to the yielding itself happens because we are yielding a Promise. Promises are just another object.
+
+This [StackOverflow post][post] might be useful.
+
+However, calling function now has to deal with the Promise. The Sagas middleware deals with it by not `.next()` before the promise is resolved.
+
+For testing purposes, it is harder to test against promises.
+
+> In the second case, the yield expression `call(delay, 1000)` is what gets passed to the caller of `next`.
+
+Which is much easier to test for, being an object. Moreover, it tells us that we can pass both Promises to the calling middleware function, as well as functions that return Promises.
+
+NO. A Promise is an object. `call` returns an object that tells the middleware what to do (what function to run), but the value that gets yielded is still an object. Yielding a function, means yielding a value that's a function. It may work, but we can't make this assumption yet with the info provided.
+
+> We want to test our `incrementAsync` Saga
+
+It appears we only test the workers, or maybe they're just first on the list of things to test.
+
+```js
+import { call, put } from 'redux-saga/effects'
+
+export function* fetchData(action) {
+  // workers get fed the action
+   try {
+      const data = yield call(Api.fetchUser, action.payload.url)
+
+      yield put({type: "FETCH_SUCCEEDED", data})
+   } catch (error) {
+      yield put({type: "FETCH_FAILED", error})
+   }
+}
+```
+
+From the previous code we can learn
+
+* saga workers get fed the action
+* promimses
+
+```js
+// use them in parallel
+export default function* rootSaga() {
+  yield takeEvery('FETCH_USERS', fetchUsers)
+  yield takeEvery('CREATE_USER', createUser)
+}
+```
+
+The difference b/w this and the previous example is that here there are no watchers, and the configuration is written right here. I suspect that I might even be able to yield a watcher here too. Not sure about `yield*`, maybe even that too if fed `watcher()`. Will have to look at docs and rethink what this means.
+
+```js
+function* fetchProducts() {
+  const products = yield Api.fetch('/products')
+  console.log(products)
+}
+```
+
+From expressions like these, we can assume that resolved Promises give their value back to the generator function.
+
+> Declarative effects
+
+Saying what is going to be done in an object, rather than doing it. Easy to test against.
+
+<!-- link sources -->
 [mdn-iterables]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Iteration_protocols
 [1]: http://gajus.com/blog/2/the-definitive-guide-to-the-javascript-generators
 [2]: https://davidwalsh.name/es6-generators
 [3]: http://www.2ality.com/2015/03/es6-generators.html
 [beginnertut]: https://yelouafi.github.io/redux-saga/docs/introduction/BeginnerTutorial.html
+[post]: http://stackoverflow.com/questions/33947850
