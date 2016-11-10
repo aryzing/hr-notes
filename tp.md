@@ -612,7 +612,60 @@ From expressions like these, we can assume that resolved Promises give their val
 
 Saying what is going to be done in an object, rather than doing it. Easy to test against.
 
+> Channels generalize [`take` and `put`] Effects to communicate with external event sources or between Sagas themselves.
+
+Don't really understand how this explanation is useful. I can't make much sense of this from what I've seen up to now. This is misplaced
+
+However, what is important, is knowing that this section is going to talk about
+
+* `actionChannel` Effect
+* `eventChannel` factory
+* `channel` factory
+
+> Canonical example [of **watch-and-fork** pattern]
+
+```js
+import { take, fork } from 'redux-saga/effects'
+
+function* watchRequests() {
+  while (true) {
+    const { payload } = yield take('REQUEST')
+    yield fork(handleRequest, payload)
+  }
+}
+```
+
+This watcher saga forks a worker saga each time a `'REQUEST'`action is dispatched.
+
+> `redux-saga` provides a helper Effect `actionChannel` [that will] process [actions] serially
+
+`actionChannel` will not process the next received action until done with the previous by queuing incoming actions.
+
+> rewrite
+
+```js
+import { take, actionChannel, call, ... } from 'redux-saga/effects'
+
+function* watchRequests() {
+  // 1- Create a channel for request actions
+  const requestChan = yield actionChannel('REQUEST')
+  while (true) {
+    // 2- take from the channel
+    const { payload } = yield take(requestChan)
+    // 3- Note that we're using a blocking call
+    yield call(handleRequest, payload)
+  }
+}
+```
+
+`take` ensures that the Saga is blocked until a new action arrives, and `call` ensures that the Saga is blocked while processing the current action.
+
+> [The] `eventChannel` [factory] creates a Channel for events from event sources other than the Redux Store
+
+
+
 <!-- link sources -->
+
 [mdn-iterables]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Iteration_protocols
 [1]: http://gajus.com/blog/2/the-definitive-guide-to-the-javascript-generators
 [2]: https://davidwalsh.name/es6-generators
