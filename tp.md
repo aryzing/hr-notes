@@ -513,6 +513,12 @@ sagaMiddleware.run(function* rootGen () {
   yield takeEvery('AT1', gen1);
   yield takeEvery('AT2', gen2);
 });
+
+// QUESTION what about
+sagaMiddleware.run(function* rootGen () {
+  yield genW1();
+  yield genW2();
+});
 ```
 
 Now I'm beginning to see that it makes sense to initialize the root generator/saga with `.run(rootSaga)`. I believe this causes the Saga library to run through everything and configure itself to listen for whatever it needs to. There doesn't seem to be logic that would require this generator to run more than once after everything is configured. Having declared the watchers, what does get run whenever an action is dispatched are the `genX` for which there are watchers.
@@ -565,6 +571,8 @@ Which is much easier to test for, being an object. Moreover, it tells us that we
 
 NO. A Promise is an object. `call` returns an object that tells the middleware what to do (what function to run), but the value that gets yielded is still an object. Yielding a function, means yielding a value that's a function. It may work, but we can't make this assumption yet with the info provided.
 
+Also, it seems that when using `call`, the middleware is prepared to handle functions that return promises (will hold on calling next until the Promise resolves, will call `.next(resolve_value)`, and will call `.throw(msg)` if it fails). If not a promise, it will probably call `.next(ret_val)` with the function's return value.
+
 > We want to test our `incrementAsync` Saga
 
 It appears we only test the workers, or maybe they're just first on the list of things to test.
@@ -611,6 +619,378 @@ From expressions like these, we can assume that resolved Promises give their val
 > Declarative effects
 
 Saying what is going to be done in an object, rather than doing it. Easy to test against.
+
+> function `cps` can be used to handle Node style [error first] functions
+
+Example: `const content = yield cps(readFile, '/path/to/file');`
+
+> create an Object to instruct the middleware that we need to dispatch some action, and let the middleware perform the real dispatch.
+
+No need to mock `dispatch` and easier to test. Can use
+
+```js
+import { call, put } from 'redux-saga/effects'
+
+function* fetchProducts() {
+  const products = yield call(Api.fetch, '/products');
+  yield put({type: 'PRODUCTS_RECEIVED', products})
+}
+```
+
+> We can catch errors inside the Saga using the [...] `try/catch` syntax.
+
+This is only the syntax, `try { /*yields*/ } catch(error) { /*more yields*/}`. It is also convenient to know when/how the middleware throws. For example, on Promimse rejection, or perhaps on some other error. Promise rejection is pretty typical example.
+
+Lets look at the syntax in more detail.
+
+```js
+function* fetchProducts() {
+  try {
+    const products = yield call(Api.fetch, '/products')
+    yield put({ type: 'PRODUCTS_RECEIVED', products })
+  }
+  catch(error) {
+    yield put({ type: 'PRODUCTS_REQUEST_FAILED', error })
+  }
+}
+```
+
+When using .throw(error), the value goes into catch's argument
+
+> Not forced to handle your API errors inside try/catch blocks. You can also make your API service return a normal value with some error flag on it.
+
+Lets take a look at the sample function they propose:
+
+```js
+function fetchProductsApi() {
+  return Api.fetch('/products')
+    .then(response => ({ response }))
+    .catch(error => ({ error }))
+}
+```
+
+What is the difference between yielding `call(fetchProductsApi)` and `call(Api.fetch, '/products')`. In both cases, the middleware receives an object instructing it to execute a function that returns a Promise.
+
+In the first case, the condition of resolving or failing Promise is left to the Api, and thus, this then affects how the middleware behaves.
+
+In the second, the promise will always resolve. Meaning that the middleware will always act as if the promise resolved, and we can then handle any error flags back in the worker saga.
+
+We can tie this with something like
+
+```js
+function* fetchProducts() {
+  const { response, error } = yield call(fetchProductsApi)
+  if (response)
+    yield put({ type: 'PRODUCTS_RECEIVED', products: response })
+  else
+    yield put({ type: 'PRODUCTS_REQUEST_FAILED', error })
+}
+```
+
+> triggering Side Effects from inside a Saga is always done by yielding some declarative Effect. (You can also yield Promise directly, but this will make testing difficult
+
+Good summary up to this point
+
+> What a Saga does is actually compose all those Effects together to implement the desired control flow.
+
+Note that in Saga parlance, the Effect is used to refer the objects yielded both watcher sagas (that define saga config) and worker sagas (that define saga actions).
+
+> `take` [...] makes it possible to build complex control flow by allowing total control of the action observation process.
+
+Small reminder of previously used `yield takeEvery('AT', worker)`.
+
+> Using `takeEvery('*')` [...] we can catch all dispatched actions
+
+Great for loggers
+
+```js
+import { takeEvery } from 'redux-saga'
+import { put, select } from 'redux-saga/effects'
+
+function* watchAndLog() {
+  yield takeEvery('*', function* logger(action) {
+    const state = yield select()
+
+    console.log('action', action)
+    console.log('state after', state)
+  })
+}
+```
+
+Small reminder: worker saga receives action that caused it to get executed as input argument.
+
+> Now let's see how to use the take Effect to implement the same flow as above
+
+```js
+import { take } from 'redux-saga/effects'
+import { put, select } from 'redux-saga/effects'
+
+function* watchAndLog() {
+  while (true) {
+    const action = yield take('*')
+    const state = yield select()
+
+    console.log('action', action)
+    console.log('state after', state)
+  }
+}
+```
+
+To begin with, this seems a bit weird. Why? because this is a watcher, and so far I have thought as watchers as used to configure behavior of middleware. If this watcher never ends, then it never ends configuring behavior.
+
+Perhaps, *all* watchers get executed each time an action is dispatched. If they contain a matching `take` or `takeEvery`, the middleware continues executing them to completion. Otherwise, calls the `.return()` on them. This could work.
+
+> The resulting behavior of the call Effect is the same as when the middleware suspends the Generator until a Promise resolves.
+
+So it seems that watchers with `takeEvery` may only run once, while those with `take` suspend until match. So `take` watchers can be safely called in an infinite loop.
+
+QUESTION. Can we have `takeEvery` in an infinite loop? Will it crash?
+
+> In the case of takeEvery the invoked tasks have no control on when they'll be called. They will be invoked again and again on each matching action. They also have no control on when to stop the observation.
+
+The behavior is predefined and will always follow the same logic for he same actions.
+
+> In the case of take the control is inverted. Instead of the actions being pushed to the handler tasks, the Saga is pulling the action by itself. It looks as if the Saga is performing a normal function call action = getNextAction() which will resolve when the action is dispatched.
+
+From here I infer that `action = getNextAction()` means that the value of a `yield take()` expression will be the matched action.
+
+> application [will] display a congratulation message then terminate. This means the Generator will be garbage collected and no more observation will take place.
+
+```js
+import { take, put } from 'redux-saga/effects'
+
+function* watchFirstThreeTodosCreation() {
+  for (let i = 0; i < 3; i++) {
+    const action = yield take('TODO_CREATED')
+  }
+  yield put({type: 'SHOW_CONGRATULATION'})
+}
+```
+
+So its like having a listener that goes away after the appropriate actions have been dispatched.
+
+How would I do this with reducers? Well, I would have a reducer that modified state of a variable each time a note is added. After x times, the value would change and the appropriate component would load.
+
+The advantage of using this approach is that we have a function for this functionality, and don't have to rely on the reducer so much to perform as complex changes to state.
+
+But the main advantage is being able to code async actions in a sync style.
+
+For example,
+
+```js
+function* loginFlow() {
+  while (true) {
+    yield take('LOGIN')
+    // ... perform the login logic
+    yield take('LOGOUT')
+    // ... perform the logout logic
+  }
+}
+```
+
+This is code represents what is meant by pulling future actions.
+
+Login and logout logic first attempt:
+
+```js
+import { take, call, put } from 'redux-saga/effects'
+import Api from '...'
+
+function* authorize(user, password) {
+  try {
+    const token = yield call(Api.authorize, user, password)
+    yield put({type: 'LOGIN_SUCCESS', token})
+    return token
+  } catch(error) {
+    yield put({type: 'LOGIN_ERROR', error})
+  }
+}
+
+function* loginFlow() {
+  while (true) {
+    const {user, password} = yield take('LOGIN_REQUEST')
+    const token = yield call(authorize, user, password)
+    if (token) {
+      yield call(Api.storeItem, {token})
+      yield take('LOGOUT')
+      yield call(Api.clearItem, 'token')
+    }
+  }
+}
+```
+
+> can also use [`call`] to invoke other Generator functions.
+
+In code above to retrieve token. Also note that when processing a generator, the expression assigned to the yield expression by the middleware is the return value of the generator.
+
+> Suppose that when the `loginFlow` is waiting [...] the user clicks on the Logout button causing a LOGOUT action to be dispatched.
+
+There will not be a `take` listening for a LOGOUT, and it will be missed.
+
+> `call` is a blocking Effect.
+
+Middleware waits for its function to return before calling `.next()` on that generator.
+
+> we do not only want `loginFlow` to execute the authorization call, but also watch for an eventual LOGOUT action that may occur in the middle of this call. That's because LOGOUT is *concurrent* to the authorize call.
+
+Logout is **concurrent**.
+
+> To express non-blocking calls, the library provides [...] `fork`.
+
+Then, the login logic to store the token must be in the forked function.
+
+A few issues:
+* What if the user clicks logout and then the server returns succesfully.
+* What if the user clicks logout and then the server returns error.
+* What if we force multiple logouts. Will that spawn/spam multiple login forks? No. There is a protecting `take` before the `fork`.
+* But the same way that the user logs out and then the server returns, what if we go around this cycle multiple times, will that spam login requests? Will we get multiple alerts after the last logout that we have failed logins?
+
+> `yield cancel(task)`
+
+The answer to my issues. So my mental model was correct: the forked processes would remain active in memory and `put`ting actions and would continue to inconsistent state.
+
+> Suppose that when we receive a `LOGIN_REQUEST` action, our reducer sets some `isLoginPending` flag to true so it can display some message or spinner in the UI. [...] Fortunately, the cancel Effect won't brutally kill our authorize task, it'll instead give it a chance to perform its cleanup logic. The cancelled task can handle any cancellation logic (as well as any other type of completion) in its `finally` block. Since a finally block execute on any type of completion (normal return, error, or forced cancellation), there is an Effect cancelled which you can use if you want handle cancellation in a special way:
+
+```js
+import { take, call, put, cancelled } from 'redux-saga/effects'
+import Api from '...'
+
+function* authorize(user, password) {
+  try {
+    const token = yield call(Api.authorize, user, password)
+    yield put({type: 'LOGIN_SUCCESS', token})
+    yield call(Api.storeItem, {token})
+    return token
+  } catch(error) {
+    yield put({type: 'LOGIN_ERROR', error})
+  } finally {
+    if (yield cancelled()) {
+      // ... put special cancellation handling code here
+    }
+  }
+}
+```
+
+> When we yield an array of effects, the generator is blocked until all the effects are resolved or as soon as one is rejected.
+
+```js
+import { call } from 'redux-saga/effects'
+
+function* () {
+  const [users, repos]  = yield [
+    call(fetch, '/users'),
+    call(fetch, '/repos')
+  ];
+}
+```
+
+>using `yield*` will cause the JavaScript runtime to spread the whole sequence.
+
+In relation to code. No clue what this means.
+
+```js
+function* playLevel1() { ... }
+function* playLevel2() { ... }
+function* playLevel3() { ... }
+
+function* game() {
+  const score1 = yield* playLevel1()
+  yield put(showScore(score1))
+
+  const score2 = yield* playLevel2()
+  yield put(showScore(score2))
+
+  const score3 = yield* playLevel3()
+  yield put(showScore(score3))
+}
+```
+
+Subsequent `(g = game()).next()` will come from `(p = playLevelX()).next()`.
+
+Longer version: `g.next() === game().next()` from `p.next() === playLevel()[@@iterator]().next() === playLevel().next()`.
+
+> Yielding to an array of nested generators will start all the sub-generators in parallel, wait for them to finish, then resume with all the results
+
+The keyword here is **nested**. I believe this means as seen
+
+```js
+function* mainSaga(getState) {
+  const results = yield [call(task1), call(task2), call(taskN)]
+  yield put(showResults(results))
+}
+```
+
+In a previous example the rootSaga took an array of generator objects. Here its taking an array of effects. What does this mean?
+
+> In fact, yielding Sagas is no different than yielding other effects (future actions, timeouts, etc). This means you can combine those Sagas with all the other types using the effect combinators.
+
+???
+
+> `yield cancel(task)` will trigger a cancellation on `subtask`, which in turn will trigger a cancellation on `subtask2`.
+
+```js
+function* main() {
+  const task = yield fork(subtask)
+  // ...
+  // later
+  yield cancel(task)
+}
+
+function* subtask() {
+  // ...
+  yield call(subtask2) // currently blocked on this call
+  // ...
+}
+
+function* subtask2() {
+  // ...
+  yield call(someApi) // currently blocked on this call
+  // ...
+}
+```
+
+> Cancellation propagates downward. [...] Returned values and uncaught errors propagates upward
+
+Makes sense.
+
+> cancellation propagates [as well to] joiners of a task
+
+Don't know what a `join` effect does yet.
+
+> `yield cancel(task)` doesn't wait for the cancelled task to finish
+
+> A Saga terminates only after it terminates its own body of instructions and all attached forks are themselves terminated
+
+A Saga will block its caller until any forks it created have finished, and it has finished its own body.
+
+Small clarification: maybe its body is already finished (no more statements left to execute). But it won't "return" to its parent until the forks are done.
+
+> [Forks are like parallel tasks]
+
+These two snippets are equivalent
+
+```js
+yield fork(saga1);
+yield fork(saga2);
+yield call(saga3);
+
+// vs
+
+yield [call(saga2), call(saga2), call(saga3)]; // aka parallel EFfect
+```
+
+> uncaught error will cause the parallel Effect to cancel all the other pending Effects.
+
+If one fails, all others are cancelled.
+
+> a Saga aborts as soon as its main body of instructions throws an error or an uncaught error was raised by one of its attached forks.
+
+Aaaaand the error value of the parent will be the same as that uncaught by a child. Just to be clear, failed fork => failed parent w/ same error code => parent can't catch fork child's error => error caught by parent of first blocking saga in ancestry.
+
+> Detached forks live in their own execution context. [...] Detached forks behave like root Sagas.
+
+
+
 
 <!-- link sources -->
 [mdn-iterables]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Iteration_protocols
