@@ -1273,6 +1273,30 @@ For testing purposes, it is recommended that only POJOs be yielded.
 **Note on using yield\***
 As far as the middleware is concerned, it is as if the yielded generator's body was in its parent.
 
+# Tutorials
+
+Ported tutorials from redux
+
+## counter-vanilla
+
+Webpack can be inserted as middleware in Express, so no need for an additional port.
+
+Uses a utility called `sagaMonitor`.
+
+[The sagaMonitor interface][sagamonitor]
+
+Can be activated/added with
+```js
+const sagaMiddleware = createSagaMiddleware({sagaMonitor})
+```
+
+To see the history of actions processed by Saga middleware, type `$$LogSagas()`. It is not a live logger.
+
+Discussion of Saga logger on github.
+## counter
+## cancellable-counter
+## Shopping Cart example
+## async example
 
 <!-- link sources -->
 
@@ -1282,3 +1306,4 @@ As far as the middleware is concerned, it is as if the yielded generator's body 
 [3]: http://www.2ality.com/2015/03/es6-generators.html
 [beginnertut]: https://yelouafi.github.io/redux-saga/docs/introduction/BeginnerTutorial.html
 [post]: http://stackoverflow.com/questions/33947850
+[sagamonitor]: https://yelouafi.github.io/redux-saga/docs/api/index.html#sagamonitor
