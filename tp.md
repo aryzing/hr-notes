@@ -1042,6 +1042,238 @@ function* watchRequests() {
 
 And here I stopped taking notes on channels
 
+# Recipes
+
+Will talk about four recipes
+
+* Throttling
+* Debouncing
+* Retrying XHR calls
+* Undo
+
+## Throttling
+
+```js
+import { throttle } from 'redux-saga'
+
+function* handleInput(input) {
+  // ...
+}
+
+function* watchInput() {
+  yield throttle(500, 'INPUT_CHANGED', handleInput, ...args)
+}
+```
+
+`handleInput` will fire at most once every 500ms period *and* it guarantees that the **trailing action will be processed**.
+
+## Debouncing
+
+> To debounce a sequence, put the `delay` in the forked task
+
+and cancel it if a new action arrives before the delay finishes.
+
+```js
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+function* handleInput(input) {
+  // debounce by 500ms
+  yield call(delay, 500)
+  // ...
+}
+
+function* watchInput() {
+  let task
+  while (true) {
+    const { input } = yield take('INPUT_CHANGED')
+    if (task) {
+      yield cancel(task)
+    }
+    task = yield fork(handleInput, input)
+  }
+}
+```
+
+> Example above could be rewritten with `redux-saga` `takeLatest` helper:
+
+
+```js
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+function* handleInput({ input }) {
+  // debounce by 500ms
+  yield call(delay, 500)
+  ...
+}
+
+function* watchInput() {
+  // will cancel current running handleInput task
+  yield takeLatest('INPUT_CHANGED', handleInput);
+}
+```
+
+## Retrying XHR calls
+
+> use a for loop with a delay:
+
+```js
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+function* updateApi(data) {
+  for(let i = 0; i < 5; i++) {
+    try {
+      const apiResponse = yield call(apiRequest, { data });
+      return apiResponse;
+    } catch(err) {
+      if(i < 5) {
+        yield call(delay, 2000);
+      }
+    }
+  }
+  // attempts failed after 5x2secs
+  throw new Error('API request failed');
+}
+
+export default function* updateResource() {
+  while (true) {
+    const { data } = yield take('UPDATE_START');
+    try {
+      const apiResponse = yield call(updateApi, data);
+      yield put({
+        type: 'UPDATE_SUCCESS',
+        payload: apiResponse.body,
+      });
+    } catch (error) {
+      yield put({
+        type: 'UPDATE_ERROR',
+        error
+      });
+    }
+  }
+}
+```
+
+Furthermore, by using `takeLatest` and an `'UPDATE_RETRY'` we can continue to retry while informing the user.
+
+```js
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+function* updateApi(data) {
+  while (true) {
+    try {
+      const apiResponse = yield call(apiRequest, { data });
+      return apiResponse;
+    } catch(error) {
+      yield put({
+        type: 'UPDATE_RETRY',
+        error
+      })
+      yield call(delay, 2000);
+    }
+  }
+}
+
+function* updateResource({ data }) {
+  const apiResponse = yield call(updateApi, data);
+  yield put({
+    type: 'UPDATE_SUCCESS',
+    payload: apiResponse.body,
+  });
+}
+
+export function* watchUpdateResource() {
+  yield takeLatest('UPDATE_START', updateResource);
+}
+```
+
+## Undo
+
+The undo strategy discussed here is a one-time undo implemented purely in sagas using `delay` and `cancel`. It does not use `redux-store` to implement this version of undo.
+
+```js
+import {  take, put, call, fork, cancel, cancelled } from 'redux-saga/effects'
+import { takeEvery, delay } from 'redux-saga'
+import { updateThreadApi, actions } from 'somewhere'
+
+function* onArchive() {
+  try {
+      const thread = { id: 1337, archived: true }
+      // show undo UI element
+      yield put(actions.showUndo())
+      // optimistically mark the thread as `archived`
+      yield put(actions.updateThread(thread))
+      // allow user time to active the undo action
+      yield call(delay, 5000)
+      // hide undo UI element
+      yield put(actions.hideUndo())
+      // make the API call to apply the changes remotely
+      yield call(updateThreadApi, thread)
+  } finally {
+    if (yield cancelled()) {
+      // revert thread to previous state
+      yield put(actions.updateThread({ id: 1337, archived: false }))
+    }
+  }
+}
+
+function* main() {
+  while (true) {
+    // listen for every `ARCHIVE_THREAD` action in a non-blocking manner.
+    const onArchiveTask = yield takeEvery(ARCHIVE_THREAD, onArchive)
+    // wait for the user to activate the undo action;
+    yield take(UNDO)
+    // and then cancel the fetch task
+    yield cancel(onArchiveTask)
+  }
+}
+```
+
+Remember that `takeEvery` returns the object to cancel the task.
+
+# What is the middleware prepared to receive, and how does it deal with what it receives
+
+```js
+function* gen() {
+  var variable = yield exp1;
+  //             ^--exp2--^
+
+  /*
+  exp1 aka
+    yield operand
+    yield operand expression
+    yield argument
+    yield argument expression
+    yield X value
+  exp2 aka
+    yield expression
+    yield expression value
+    yield value
+  */
+}
+```
+
+Everything that happens starts with the root generator. This root generator is the entry point to configure the middleware. The `.run()` function runs through the generator, so it must be made to have a non-infinite body, or else the app will stall.
+
+Next, the root the root app can `yield` objects, and the middleware treats these no differently than objects yielded by "child" generators.
+
+**Object (POJO)** objects constructed in a particual way are understood by the middleware as instructions to execute. These interpreted objects, in Saga parlance, are called **Effects**. Some effects instruct to run **blocking calls**, meaning that newly dispatched actions are not processed by the generator that yields them. If it receives an object that it is unable to interpret, it will simply return the object as the yield value.
+
+For testing purposes, it is recommended that only POJOs be yielded.
+
+**Promise** waits for the promise to complete. On completion, calls `.next(value)` if fulfilled or `.throw(error)` if rejected. Therefore, yielding a Promise blocks the generator.
+
+**Function** (non-generator function) executes the function and passes its return value to the parent generator `.next(func())`.
+
+**Object (Generator)** Generator objects are run to completion. Just as expected.
+
+**Array** Values in array are processed in parallel. If they are Effects, they are interpreted and processed.
+
+**Note on return values** When a function returns, generator or otherwise, the return value is given to parent generator `.next(ret_val)`.
+
+**Note on using yield\***
+As far as the middleware is concerned, it is as if the yielded generator's body was in its parent.
+
+
 <!-- link sources -->
 
 [mdn-iterables]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Iteration_protocols
