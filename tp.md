@@ -1279,7 +1279,19 @@ Ported tutorials from redux
 
 ## counter-vanilla
 
+## counter
+
 Webpack can be inserted as middleware in Express, so no need for an additional port.
+
+```js
+var webpack = require('webpack')
+
+var webpackDevMiddleware = require('webpack-dev-middleware')
+var webpackHotMiddleware = require('webpack-hot-middleware')
+
+app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: config.output.publicPath }))
+app.use(webpackHotMiddleware(compiler))
+```
 
 Uses a utility called `sagaMonitor`.
 
@@ -1292,11 +1304,20 @@ const sagaMiddleware = createSagaMiddleware({sagaMonitor})
 
 To see the history of actions processed by Saga middleware, type `$$LogSagas()`. It is not a live logger.
 
-Discussion of Saga logger on github.
-## counter
+[Discussion of Saga logger on github][discussion].
+
 ## cancellable-counter
+
+
 ## Shopping Cart example
+
 ## async example
+
+Uses the `select()` effect. This effect passes the redux state to the provided function, called **selector**. This effect was designed to be able to extract and return parts of state.
+
+An interesting patter is providing a reducer (either root or not) to get the part of the state that reducer handles.
+
+
 
 <!-- link sources -->
 
@@ -1307,3 +1328,4 @@ Discussion of Saga logger on github.
 [beginnertut]: https://yelouafi.github.io/redux-saga/docs/introduction/BeginnerTutorial.html
 [post]: http://stackoverflow.com/questions/33947850
 [sagamonitor]: https://yelouafi.github.io/redux-saga/docs/api/index.html#sagamonitor
+[discussion]: https://github.com/yelouafi/redux-saga/issues/5
