@@ -1,3 +1,5 @@
+* Email someone about inconsistency on CSS for secondary button.
+  * css file: \#ffffff. Inspected: \#333333.
 * Node environment variables
 * ANCCRE
 * Review http://es6-features.org/, https://github.com/rse/es6-features

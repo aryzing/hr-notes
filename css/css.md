@@ -7,10 +7,16 @@ CSS reset: [Eric Meyer's reset](http://meyerweb.com/eric/tools/css/reset/).
 
 Comments: `/* ... */`
 
+# Cascading
+
+When deciding which attribute value to apply to an element, the attribute under the rule with the highest specificity takes precedence. For rules with equal specificity, the latest in the source code takes precedence. This is called **cascading**.
+
 Cascading: highest specificity wins, equal specificities cascade.
 * Type: `0-0-1`
 * Class: `0-1-0`
 * ID: `1-0-0`
+
+> Universal selector (\*), combinators (+, >, ~, ' ') and negation pseudo-class (:not()) have no effect on specificity.
 
 **Key selector**: selector farthest to the right in a rule.
 
