@@ -1,3 +1,17 @@
+# Creating repo on github to repo already existing on laptop
+
+After creation,
+
+```
+git remote add origin <ssl or https location>
+git remote -v # will list remotes
+
+# add and commit
+
+# enables auto push
+git push --set-upstream origin master
+```
+
 # Git
 
 Setting global variable `push.default` to `simple` makes enables pushing to the target remote branch with same name as active local branch. [Article](http://stackoverflow.com/questions/13148066/warning-push-default-is-unset-its-implicit-value-is-changing-in-git-2-0).
