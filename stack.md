@@ -1,3 +1,10 @@
+* Atom snippets
+* Promises and generators http://stackoverflow.com/questions/33947850/what-happens-when-promise-is-yielded-in-javascript
+* Browsersync
+* Native api browser history push, pop, ajax request https://developer.mozilla.org/en-US/docs/Web/API/History_API
+* Complex saga workflow
+* Refresh react https://css-tricks.com/learning-react-router/, https://facebook.github.io/react/docs/react-api.html#createelement
+* ECMA script state pointers, stages, etc and how it works.
 * Email someone about inconsistency on CSS for secondary button.
   * css file: \#ffffff. Inspected: \#333333.
 * Node environment variables
