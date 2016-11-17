@@ -1,3 +1,20 @@
+* Rules for node module lookup
+  * https://www.bennadel.com/blog/2169-where-does-node-js-and-require-look-for-modules.htm
+  * https://nodejs.org/api/modules.html#modules_file_modules
+  *
+* Exporting various modules in an object
+  * http://stackoverflow.com/questions/40649604/displaying-one-of-multiple-components-best-practices
+  * http://stackoverflow.com/questions/35665759/es6-how-can-you-export-an-imported-module-in-a-single-line
+  * http://stackoverflow.com/questions/29722270/import-modules-from-files-in-directory
+* Investigate library `react-modal` for ideas
+  * https://github.com/reactjs/react-modal
+  * https://reactcommunity.org/react-modal/
+* Remember to do switch statements with `case bleh: {st1; st2; stN;}`
+* Fading React components in and out
+  * https://github.com/bentatum/react-fade/blob/master/src/Fade.js
+  * https://facebook.github.io/react/docs/animation.html
+  *
+* Modifying tags in <head> from react, server side rendering?, helmet?
 * Atom snippets
 * Promises and generators http://stackoverflow.com/questions/33947850/what-happens-when-promise-is-yielded-in-javascript
 * Browsersync
