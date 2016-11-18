@@ -1,3 +1,9 @@
+* Server side rendering
+* Go over authorization, authentication, Oauth?
+  * How to make a Token invalid (a token tha has already been issued) and that is otherwise valid
+    * because maybe it has been compromised
+* For (# Calling Promises) Api.fetch.then().catch() will resolve promise?
+* Check how yield expression resolves to value of resolved promise
 * Rules for node module lookup
   * https://www.bennadel.com/blog/2169-where-does-node-js-and-require-look-for-modules.htm
   * https://nodejs.org/api/modules.html#modules_file_modules
