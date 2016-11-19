@@ -4,9 +4,9 @@ https://promisesaplus.com/
 
 # ES6 Iterators
 
-Notes from [ponyfoo iterators]().
+Notes from [ponyfoo iterators](https://ponyfoo.com/articles/es6-iterators-in-depth).
 
-Two new protocols ES6: **Iterable protocol** and **Iterator protocol**.
+Two new protocols in ES6: **Iterable protocol** and **Iterator protocol**.
 
 These protocols allow you to make an object an iterable and specify the iteration behavior.
 
