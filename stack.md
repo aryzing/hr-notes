@@ -1,3 +1,4 @@
+* Explore http://es6-features.org/
 * More ponyfoo articles
 * Atom configuration files
 * Server side rendering

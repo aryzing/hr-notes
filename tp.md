@@ -6,7 +6,7 @@ https://promisesaplus.com/
 
 Two new protocols ES6: **Iterable protocol** and **Iterator protocol**.
 
-These protocols allow you to make an object iterable and specify the iteration behavior.
+These protocols allow you to make an object an iterable and specify the iteration behavior.
 
 Protocols aka conventions.
 
@@ -91,7 +91,7 @@ Finished ponyfoo article.
 
 # ES6 Generators - ponyfoo
 
-Can declare a *generator function* which returns *generator objects* which are iterable: `Array.from(g)`, `[...g]`, `for value of g`.
+Can declare a **generator function** which returns **generator objects** which are iterable: `Array.from(g)`, `[...g]`, `for value of g`.
 
 These functions declare a special kind of iterator. These iterators can suspend execution while retaining context.
 
@@ -118,7 +118,7 @@ console.log(Array.from(g))
 // <- ['f', 'o', 'o']
 ```
 
-`g` is an interator, and the values of the iteration it provides are those yielded by the generator function. `g` is akin to an object with `.next()` method, and the values `.next()` would return are the yielded ones.
+`g` is an iterator, and the values of the iteration it provides are those yielded by the generator function. `g` is akin to an object with `.next()` method, and the values `.next()` would return are the yielded ones.
 
 `g` is also iterable. This means that object `g` not only has something similar to a `.next()` method, but it also has a `@@iterator` method. This method must return an iterator, and it turns out the iterator it returns is `g` itself.
 
