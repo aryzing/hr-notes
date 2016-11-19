@@ -1,67 +1,38 @@
-# Setup and stuff to look into
-
-* Atom configuration files
-* Sagas + anything on ponyfoo
-* Promises
-
-## Promises
+# Promises
 
 https://promisesaplus.com/
 
-## Sagas
+# ES6 Iterators - ponyfoo
 
-Seperate thread solely responsible for side effects.
+Two new protocols ES6: **Iterable protocol** and **Iterator protocol**.
 
-`redux-saga` is redux middleware. Thread can be started, paused, and cancelled from app with redux actions, has access to state, and can itself dispatch actions.
-
-Uses ES6 Generators.
-
-## ES6 Iterators - ponyfoo
-
-Two new protocols ES6: **Iterators** and **Iterables**. Iterable protocol allows you to define "under the hood" behavior of JS iteration on iterable objects. Modifies `@@iterator` method.
+These protocols allow you to make an object iterable and specify the iteration behavior.
 
 Protocols aka conventions.
 
-[From MDN][mdn-iterables], new additions to the language include not only  built-ins and syntax, but protocols too. Protocols can be implemented by any object respecting conventions.
+[stackoverflow post][SO-iterator-iterable]
 
-Example: **Iterable protocol** and **Iterator protocol**. These look like two different protocols, but they seem to be closely related.
-
-To be iterable, but implement `@@iterator` method (or be in prototype). In other words, must have a key with the name `@@iterator`. This key name is accessible via the constant `Symbol.iterator`.
-
-Why can't I just declare this property like
+To make an object an iterable, we must define an iterator method on the object or on its prototype chain. The method must be defined at a specific key which we refer to as the `@@iterator` key. The key name is the result of the expression `Symbol.iterator`.
 
 ```js
 var a = {};
-a["@@iterator"] = () => {/*...*/};
+a["@@iterator"]    = () => {/*...*/}; // wrong
+a[Symbol.iterator] = () => {/*...*/}; // right
 ```
 
-It seems that everything involving Symbol is in a realm of its own. `Symbol.iterator` does indeed access the `@@iterator` method, but it is like a language construct method, "under the hood" namesapce, not directly intended to be used by programmers for "habitual" programming, if that makes sense.
+The iterator method is a zero arguments function that returns an object conforming to the iterator protocol.
 
-So, comming back to the discussion, an object can be made to conform to the iterable protocol by defining the `@@iterator` "language"/"under the hood" property, which is not the same as the `a["@@iterator"]` property.
+On loop, the `@@iterator` method is called and the returned iterator object is used to obtain the iteration values.
 
-Going back to MDN article.
+An iterator is an object that has a `.next()` method that produces the next value in an iteration. Specifically, `next()` returns an object with two properties: `done` and `value`.
 
-An iteration function must be defined at the `@@iterator` key of an object, which is referenced using the constant `Symbol.iterator`.
-
-The function is a zero arguments function that returns an object conforming to the iterator protocol.
-
-On loop, the `@@iterator` method is called and the returned iterator is used to obtain values to be iterated.
-
-So, up to here, the explanation of how and under which key to create the iterator function **is** the iterable protcol, meaning that this is what is necessary to make an object iterable.
-
-Now, we will explain the iterator protocol, which defines how the object returned by the iterator function is used to defin the iteration sequence.
-
-"An object is an iterator when it implements a `next()` method with the following semantics"
-
-`next()` must return an object with two properties: `done` and `value`.
-
-Small recap: The `@@iterator` method must return an object with a `next()` method that must return an object with two properties: `done` and `value`.
+Small recap: An object is an iterable when it has an `@@iterator` method that returns an object with a `next()` method that returns an object with two properties, `done` and `value`.
 
 If any part of this does not work as expected, an error will emerge: "TypeError: iterator.next() returned a non-object value".
 
 Looking into a few examples.
 
-Example1: "Some iterators are in turn iterables". All this means is that iterators, which are just objects with a `next()` methods that operates according to the iterator convention, also have their `@@iterator` function defined too.
+Example1: "Some iterators are in turn iterables". All this means is that iterators, which are just objects with a `next()` method that operates according to the iterator convention, also have an `@@iterator` function defined.
 
 In the MDN article, there is a value whose type is `[object Array Iterator]`. I don't know if I myself can create a value with this type, or a similar one. To test this, I created the following script with the expectationt that the typeof would be something like `[object Iterator]`, but unfortunately it did not work.
 
@@ -118,7 +89,7 @@ Simple, just never say that `done` is true. This can work for loops if we inted 
 
 Finished ponyfoo article.
 
-## ES6 Generators - ponyfoo
+# ES6 Generators - ponyfoo
 
 Can declare a *generator function* which returns *generator objects* which are iterable: `Array.from(g)`, `[...g]`, `for value of g`.
 
@@ -218,7 +189,7 @@ Finally, `g.return()` finalizes the sequence without any errors. I'm assuming it
 
 Attention! The convention with generators is that the iterator returns {done: true} when we are **passed** the final value. The behavior of having a `return` statement in the generator (as well as using `g.return()`) is that the iterator object's `next().done` will be true, so even if a value is returned, in most cases it will be ignored. It should be ignored. That is the behavior of the builtin functions that deal with iterators.
 
-## Sagas
+# Sagas
 
 Official recommended articles  by Sagas creator:
 
@@ -228,7 +199,7 @@ Official recommended articles  by Sagas creator:
 
 Comparison of thunk and saga middleware: Thunk uses the `typeof` (presumably, or similar)  of the object to determine if it must deal with it, whereas Saga uses the type field of the action to determine if it must deal with it.
 
-### First tutorial
+## First tutorial
 
 [Beginner Tutorial][beginnertut].
 
@@ -485,7 +456,7 @@ Something to remember: Well, what yield expression argument can Saga consume? It
 * the Effect can be a function that returns a promise
 * can the call effect consume a function other than one that returns a promise?
 
-## Advanced Sagas
+# Advanced Sagas
 
 Up to this point I have more or less understood most of what I have read. But now I am becoming saturated. Why? My knowledge of generators is recent and not always at 100%. Also, I am not entirely familiar with how Saga consumes generators. For example, I don't understand how it is able to consume one, or a root with several yielded, or a root with a single yield of an array.
 
@@ -1051,7 +1022,7 @@ Will talk about four recipes
 * Retrying XHR calls
 * Undo
 
-## Throttling
+# Throttling
 
 ```js
 import { throttle } from 'redux-saga'
@@ -1067,7 +1038,7 @@ function* watchInput() {
 
 `handleInput` will fire at most once every 500ms period *and* it guarantees that the **trailing action will be processed**.
 
-## Debouncing
+# Debouncing
 
 > To debounce a sequence, put the `delay` in the forked task
 
@@ -1112,7 +1083,7 @@ function* watchInput() {
 }
 ```
 
-## Retrying XHR calls
+# Retrying XHR calls
 
 > use a for loop with a delay:
 
@@ -1186,7 +1157,7 @@ export function* watchUpdateResource() {
 }
 ```
 
-## Undo
+# Undo
 
 The undo strategy discussed here is a one-time undo implemented purely in sagas using `delay` and `cancel`. It does not use `redux-store` to implement this version of undo.
 
@@ -1277,9 +1248,9 @@ As far as the middleware is concerned, it is as if the yielded generator's body 
 
 Ported tutorials from redux
 
-## counter-vanilla
+# counter-vanilla
 
-## counter
+# counter
 
 Webpack can be inserted as middleware in Express, so no need for an additional port.
 
@@ -1306,12 +1277,12 @@ To see the history of actions processed by Saga middleware, type `$$LogSagas()`.
 
 [Discussion of Saga logger on github][discussion].
 
-## cancellable-counter
+# cancellable-counter
 
 
-## Shopping Cart example
+# Shopping Cart example
 
-## async example
+# async example
 
 Uses the `select()` effect. This effect passes the redux state to the provided function, called **selector**. This effect was designed to be able to extract and return parts of state.
 
@@ -1321,6 +1292,7 @@ An interesting patter is providing a reducer (either root or not) to get the par
 
 <!-- link sources -->
 
+[SO-iterator-iterable]: http://stackoverflow.com/questions/6863182/what-is-the-difference-between-iterator-and-iterable-and-how-to-use-them
 [mdn-iterables]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Iteration_protocols
 [1]: http://gajus.com/blog/2/the-definitive-guide-to-the-javascript-generators
 [2]: https://davidwalsh.name/es6-generators
