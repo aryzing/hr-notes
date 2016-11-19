@@ -2,7 +2,9 @@
 
 https://promisesaplus.com/
 
-# ES6 Iterators - ponyfoo
+# ES6 Iterators
+
+Notes from [ponyfoo iterators]().
 
 Two new protocols ES6: **Iterable protocol** and **Iterator protocol**.
 
@@ -12,7 +14,7 @@ Protocols aka conventions.
 
 [stackoverflow post][SO-iterator-iterable]
 
-To make an object an iterable, we must define an iterator method on the object or on its prototype chain. The method must be defined at a specific key which we refer to as the `@@iterator` key. The key name is the result of the expression `Symbol.iterator`.
+To make an object an iterable, we must define an iterator method on the object or on its prototype chain. The method must be defined at a specific key which we refer to as the `@@iterator` key. The key name is the result of the expression `Symbol.iterator`, meaning it is a computed property name, and must be accessed with `[]`.
 
 ```js
 var a = {};
@@ -22,45 +24,13 @@ a[Symbol.iterator] = () => {/*...*/}; // right
 
 The iterator method is a zero arguments function that returns an object conforming to the iterator protocol.
 
-On loop, the `@@iterator` method is called and the returned iterator object is used to obtain the iteration values.
+The iterator protocol states that the returned object must have a `.next()` method that produces the next value in an iteration. Specifically, `next()` returns an object with two properties: `done` and `value`.
 
-An iterator is an object that has a `.next()` method that produces the next value in an iteration. Specifically, `next()` returns an object with two properties: `done` and `value`.
+Whenver a "built-in iteration" takes place, the `@@iterator` method is called and the returned iterator object is used to obtain the iteration values.
 
-Small recap: An object is an iterable when it has an `@@iterator` method that returns an object with a `next()` method that returns an object with two properties, `done` and `value`.
+To put it all together, an object is an iterable when it has an `@@iterator` method that returns an object that is an iterator. The iterator object's `next()` method returns an object with two properties, `done` and `value`.
 
-If any part of this does not work as expected, an error will emerge: "TypeError: iterator.next() returned a non-object value".
-
-Looking into a few examples.
-
-Example1: "Some iterators are in turn iterables". All this means is that iterators, which are just objects with a `next()` method that operates according to the iterator convention, also have an `@@iterator` function defined.
-
-In the MDN article, there is a value whose type is `[object Array Iterator]`. I don't know if I myself can create a value with this type, or a similar one. To test this, I created the following script with the expectationt that the typeof would be something like `[object Iterator]`, but unfortunately it did not work.
-
-```js
-var a = {};
-
-a[Symbol.iterator] = function () {
-  return {
-    next: function () {
-      return {
-        done: true
-      };
-    },
-  };
-};
-
-typeof a; // object
-```
-
-I believe this is because the array iterator is a builtin, and thus `typeof` yields a value to that reflects the builtin nature of those iterators.
-
-MDN article gets more intense during the builtin section. Going back to ponyfoo.
-
-ponyfoo
-
-The `@@iterator` methtod is called once when an object is to be iterated over. The iterator key must be accessed using square brackets because it's a *computed property*.
-
-Very good paragraph from ponyfoo:
+Food for thought: "Some iterators are in turn iterables". All this means is that iterators, which are objects with a `next()` method that produces values of some iterable, also have an `@@iterator` function defined.
 
 > You can use `for..of` to iterate over any object that adheres to the iterable protocol. In ES6, that includes arrays, any objects with an user-defined `[Symbol.iterator]` method, generators, DOM node collections from `.querySelectorAll` and friends, etc. If you just want to “cast” any iterable into an array, a couple of terse alternatives would be using the spread operator and `Array.from`.
 
@@ -81,13 +51,9 @@ for (let list of $('ul')) {
 }
 ```
 
-Iterators are *lazy in nature*. Sequence is accessed one item at a time. Of course it is, the `next()` function is executed everytime the next value in the iteration is necessary. This also opens the door to infinite series of values being valid series too.
+Iterators are *lazy in nature*, meaning the sequence values are accessed one at a time. This allows for infinite sequences by creating an iterator that never returns `{done: true}`.
 
-Small incursion into infinite loops.
-
-Simple, just never say that `done` is true. This can work for loops if we inted a loop to be infinite, but will not be useful when using the spread operator for example. `[...foo]` will stall program.
-
-Finished ponyfoo article.
+This works for loops if we inted a loop to be infinite, but will not be useful when using the spread operator for example. `[...foo]` will stall program.
 
 # ES6 Generators - ponyfoo
 
