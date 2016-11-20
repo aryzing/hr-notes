@@ -5,7 +5,6 @@
 * Go over authorization, authentication, Oauth?
   * How to make a Token invalid (a token tha has already been issued) and that is otherwise valid
     * because maybe it has been compromised
-* Promises deep dive
 * For (# Calling Promises) Api.fetch.then().catch() will resolve promise?
 * Check how yield expression resolves to value of resolved promise
 * Rules for node module lookup
