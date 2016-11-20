@@ -1,65 +1,12 @@
-# Promises
+# ES6 Generators
 
-https://promisesaplus.com/
+Notes from https://ponyfoo.com/articles/es6-generators-in-depth
 
-# ES6 Iterators
+Can declare a **generator function** which returns **generator objects**.
 
-Notes from [ponyfoo iterators](https://ponyfoo.com/articles/es6-iterators-in-depth).
+A generator function can suspend execution while retaining context.
 
-Two new protocols in ES6: **Iterable protocol** and **Iterator protocol**.
-
-These protocols allow you to make an object an iterable and specify the iteration behavior.
-
-[stackoverflow post][SO-iterator-iterable]
-
-To make an object an iterable, we must define an iterator method on the object or on its prototype chain. The method must be defined at a specific key which we refer to as the `@@iterator` key. The key name is the result of the expression `Symbol.iterator`, meaning it is a computed property name, and must be accessed with `[]`.
-
-```js
-var a = {};
-a["@@iterator"]    = () => {/*...*/}; // wrong
-a[Symbol.iterator] = () => {/*...*/}; // right
-```
-
-The iterator method is a zero arguments function that returns an object conforming to the iterator protocol.
-
-The iterator protocol states that the returned object must have a `.next()` method that produces the next value in an iteration. Specifically, `next()` returns an object with two properties: `done` and `value`.
-
-Whenver a "built-in iteration" takes place, the `@@iterator` method is called and the returned iterator object is used to obtain the iteration values.
-
-To put it all together, an object is an iterable when it has an `@@iterator` method that returns an object that is an iterator. The iterator object's `next()` method returns an object with two properties, `done` and `value`.
-
-Food for thought: "Some iterators are in turn iterables". All this means is that iterators, which are objects with a `next()` method that produces values of some iterable, also have an `@@iterator` function defined.
-
-> You can use `for..of` to iterate over any object that adheres to the iterable protocol. In ES6, that includes arrays, any objects with an user-defined `[Symbol.iterator]` method, generators, DOM node collections from `.querySelectorAll` and friends, etc. If you just want to “cast” any iterable into an array, a couple of terse alternatives would be using the spread operator and `Array.from`.
-
-Two examples of why iterators are very useful:
-
-1. Libraries such as lo-dash can implement their utility functions using constructs native to the language.
-2. Array-like objects, such as argument lists or jQuery wrapped DOM nodes can be easily iterated over.
-
-From 2, if jQuery implemented iterator protocol, code could look something like
-
-```js
-for (let list of $('ul')) {
-  // list is a matched `ul` DOM node wrapped in jQuery
-  for (let item of list.find('li')) {
-    // item is `li` node child of the outer for's `ul`.
-    console.log(item);
-  }
-}
-```
-
-Iterators are *lazy in nature*, meaning the sequence values are accessed one at a time. This allows for infinite sequences by creating an iterator that never returns `{done: true}`.
-
-This works for loops if we inted a loop to be infinite, but will not be useful when using the spread operator for example. `[...foo]` will stall program.
-
-# ES6 Generators - ponyfoo
-
-Can declare a **generator function** which returns **generator objects** which are iterable: `Array.from(g)`, `[...g]`, `for value of g`.
-
-These functions declare a special kind of iterator. These iterators can suspend execution while retaining context.
-
-A generator object is both iterable and iterator. Code excerpt from ponyfoo, explanation below.
+A generator object is both iterator and iterable: the values it iterates over are those yielded by the generator function and it is its own iterator.
 
 ```js
 function* generator () {
@@ -82,39 +29,82 @@ console.log(Array.from(g))
 // <- ['f', 'o', 'o']
 ```
 
-`g` is an iterator, and the values of the iteration it provides are those yielded by the generator function. `g` is akin to an object with `.next()` method, and the values `.next()` would return are the yielded ones.
+When calling `g.next()`, the the generator function will run from where it left off. When it reaches a **yield expression**, the yielded value will be the next value in the iteration sequence requested by `g.next()`.
 
-`g` is also iterable. This means that object `g` not only has something similar to a `.next()` method, but it also has a `@@iterator` method. This method must return an iterator, and it turns out the iterator it returns is `g` itself.
+The generator object `g` is also iterable meaning it has an `@@iterator` method. This method must return an iterator object, and it turns out the object it returns is `g` itself.
 
-Going back to the generator function, between `yield` statements it can perform other operations. These are known as side effects.
+The yield operator can be used with an asterisk, `yield*`, meaning that instead of returning the value it is given, it will instead treat the value as an iterable and have that object's `@@iterator` method provide the next values in the sequence.
 
-The yield operator can be used with an asterisk, `yield*`, meaning that instead of returning the value it is given, it should instead treat the value as an iterable and have that object's `@@iterator` method provide the next values in the sequence.
+A generator function can perform operations other than yield values. These are known as side effects.
 
-To understand how values are provided by generator functions, each time a `next()` method is run, the generator function resumes execution where it left off. This means that a subsequent yield may be hit, or the end of the function may be reached, meaning that the result of `next().done` would be true.
+When a generator function returns or reaches the end, `.next().done` is true, and the returned value stored in `.next().value`.
 
-Context is preserved across suspensions of a generator function. The four scenarios that will suspend execution are
+# Diving deeper
 
-* `yield` expression returning the next value.
-* `return` statement returning the last value.
-* `throw` statement halts execution.
-* Reaching the end of the generator function, making `{done: true}`.
+Generator objects have more powerful methods than "plain" iterators that can be used to interact with the generator function.
 
-One note:
-* They are "yield expressions", not "yield statements".
+The `.next(value)` method accepts an argument, which will be what the currently halted yield expression evaluates to.
 
-Lets dive a little deeper into generators
+```js
+function* gen(num) {
+  var a = yield num + 1
+  yield a + 3
+  console.log(a)
+  return 19
+}
 
-To consider: other methods (`.return()` and `.throw()`) as well as possibility of sending values into the generator (`.next(value)`).
+var g = gen(1)
+g.next()  // {done: false, value: 2}
+g.next(5) // {done: false, value: 8}
+g.next()  // logs '5', {done: true, value: 19}
 
-Minor revelation: the keyword `yield` has been specifically created to be used with generators. I previously was mixing it up with `await`, so I though there were more purposes for it, and was not concentrating fully on its use.
+// subsequent calls will always return {done: true, value: undefined}
+g.next() // {done: true, value: undefined}
+```
+
+The `.return(value)` method makes the generator terminate prematurely. It returns an object indicating that the generator is done with the value of the passed argument.
+
+```js
+function* gen(num) {
+  var a = yield num + 1
+  yield a + 3
+  console.log(a)
+  return 19
+}
+
+var g = gen(1)
+g.return(10)  // {done: true, value: 10}
+g.next()  // {done: true, value: undefined}
+```
+
+The `.throw(reason)` method causes an error to be thrown at the currently halted yield expression. The `reason` may be caught if the yield expression is within a `try/catch` block. The value returned is that of the next yield it encounters if the error is caught, or causes the application to throw otherwise.
+
+```js
+function* gen(num) {
+  try {
+    var a = yield num + 1
+    yield a + 3
+    console.log(a)
+  } catch (err) {
+    console.log(err)
+  }
+  return 19
+}
+
+var g = gen(1)
+g.next(1)  // {done: true, value: 10}
+g.throw('boom')  // logs 'boom', {done: true, value: 19}
+```
+
+# Inversion of control
 
 Most generators are used using an inversion of control pattern, meaning that the values to iterate over, and thus the generator function as a whole, is what is passed into a function that handles the iteration.
 
-> Letting the library deal with the flow control means you can just worry about whata you want to iterate over, and delegate how to iterate over it.
+> Letting the library deal with the flow control means you can just worry about what you want to iterate over, and delegate how to iterate over it.
 
-And now, let get into async.
+# Async operations
 
-Wow, it is pretty awesome. Basically, with the yield operator, we can create the following async pattern:
+With the yield operator, we can create the following async pattern:
 
 1. Pass generator function to consumer library with values we want processed.
 2. The consumer library will iterate pop out the first value, take some action, and when done, can then call `.next()` method of the iterable generator object to process the next value. The "processing" of the value can be async, the generator function does not care, it simply produces the next desirable value in the sequence when requested and leaves the library to its processing.

@@ -1,13 +1,26 @@
-# Understanding promises
+# Promises
 
-In node, promises can be used with `bluebird`:
+Conceptually, "a `Promise` represents a value which may be available now, or in the future, or never" - [MDN Promise][1]. Promises are implemented by making async functions return an instance of a Promise which conform to a specific API.
+
+The Promise object returned provides a means of accesing the potentially async value, treat it, and possibly run another Promise, allowing these to be chained together.
+
+# Interacting with Promises
+
+Usually we will use a library which says that a particular function returns a Promise
+
+Usually we will be using Promises when using a library that performs async operations. For exxample, fetch, mongoDB queries, etc. These libraries provide functions which perfrom an async operation and return a promise object that represents the value of the operation.
+
+When using these libraries, the Promise conforming object their functions return has been created by them, and we need not have a native Promise support to use them. If we wish to create our own promises, then we must ensure execution env has Promises or import a Promise library.
+
+# Creating Promises
+
+If the current JS environment does not support Promises natively, we may use a [Promise library](https://promisesaplus.com/implementations). A good Promise library for Node is [`bluebird`](https://github.com/petkaantonov/bluebird).
+
 ```js
 var Promise = require('bluebird');
 ```
 
-Conceptually, "a `Promise` represents a value which may be available now, or in the future, or never" - [MDN Promise][1]. Promises are implemented by making async functions return an instance of a Promise which conform to a specific API.
-
-The Promise object returned provides a means of accesing the potentially async value, treat it, and possibly run another promise, allowing these to be chained together. Functions returning a Promise can be manually created, or we can use the built-in promise generator:
+Functions returning a Promise can be manually created, or we can use the built-in promise generator:
 
 ```js
 var taskFuncAsync = Promise.promisify(taskFunc);
@@ -54,6 +67,8 @@ function taskFunc(...args, callback) {
   }
 }
 ```
+
+# Using Promises
 
 So, how does the promisified function work? It can be called as expected, but there is no need to supply a callback. Instead, subsequent operations can be queued using the `then` method. This method takes two functions as arguments, the first of which is executed if the Promise was succesful and the second if it was not.
 
