@@ -10,8 +10,6 @@ Two new protocols in ES6: **Iterable protocol** and **Iterator protocol**.
 
 These protocols allow you to make an object an iterable and specify the iteration behavior.
 
-Protocols aka conventions.
-
 [stackoverflow post][SO-iterator-iterable]
 
 To make an object an iterable, we must define an iterator method on the object or on its prototype chain. The method must be defined at a specific key which we refer to as the `@@iterator` key. The key name is the result of the expression `Symbol.iterator`, meaning it is a computed property name, and must be accessed with `[]`.
