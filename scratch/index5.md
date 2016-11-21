@@ -68,10 +68,12 @@ function* session() {
   }
 }
 
+// logic for retrying based on server errors goes here
 function* authenticate(...args) {
   try {
     var token = yield call(Api.fetch, ...args)
     var call(saveToken(token))
+    yield put({type: 'LOGIN_SUCCESS'})
   } catch (err) {
     put({type: 'LOGIN_ERROR'})
   }
@@ -84,13 +86,33 @@ function* watchSave() {
 function* save() {
   while (true) {
     yield take('SAVE')
-    yield put('ATTEMPT_SAVE')
+    yield put({type: 'ATTEMPT_SAVE'})
     try {
-      yield call(Api.fetch, '/save')
-      yield put({type: 'SAVE_SUCCESS'})
+      var dataToSave = yield select(settingsReducer)
+      var response = yield call(Api.fetch, '/save', dataToSave)
+      yield put({type: 'SAVE_SUCCESS', payload: response})
     } catch (err) {
-      if (err.code === '401')
-      yield put({type: 'SHOW_LOGIN_MODAL'})
+      if (err.code === '401') {
+        yield put({type: 'SHOW_LOGIN_MODAL'})
+        yield take('LOGIN_SUCCESS')
+        yield put({type: 'HIDE_LOGIN_MODAL'})
+        yield put({type: 'SAVE'})
+      }
     }
   }
+}
+
+function* request() {
+  for(let i = 0; i < 5; i++) {
+    try {
+      const apiResponse = yield call(apiRequest, { data });
+      return apiResponse;
+    } catch(err) {
+      if(i < 5) {
+        yield call(delay, 2000);
+      }
+    }
+  }
+  // attempts failed after 5x2secs
+  throw new Error('API request failed');
 }
