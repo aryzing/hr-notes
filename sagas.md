@@ -1,8 +1,8 @@
 # Sagas
 
-# Basic Intro
-
 source: https://yelouafi.github.io/redux-saga/docs/introduction/BeginnerTutorial.html
+
+# Basic Intro
 
 Sagas can yield
 
@@ -18,22 +18,122 @@ source: https://yelouafi.github.io/redux-saga/docs/basics/UsingSagaHelpers.html
 
 ... the lower level **Saga API**.
 
-Sagas can yield a Promise, or an object that instructs to run a function which returns a Promise. Both are equivalent in behavior, but the latter is easier to debug.
+# Most common yield operations
 
-If Promise, value of yield expression will be the resolved value.
+When does yield return a value (.next(value))
+Regular functions do not block
+Types of values that may be yielded
+When are actions supplied to sagas?
 
-The argument to the Saga is the dispatched action.
+## `yield` return values
 
-# Calling Promises
+A `yield` expression will evaluate to a value when:
 
-Promise can resolve (yield value expression) or reject (error is thrown to generator).
+### A Promise is yielded and it resolves
 
-Can wrap Promises in own promise to catch error and return value, which counts as resolved promise, and deal with returned value in generator.
+Will return the resolved value of a Promise
 
-# Other
+```js
+function middleware(p) {
+  p.then(onResolve, onReject)
 
-Forks make error in calling saga
+  function onResolve(pojo) {
+    g.next(pojo)
+  }
 
-Yielding arrays same as forking one after the other
+  function onReject(pojo) {
+    g.throw(pojo)
+  }
+}
+```
 
-Cancelling fork, makes all children forks cancel too
+### A function is yielded
+
+Return value of the function
+
+### A `call()` Effect is yielded
+
+The return value of the function will be assigned to the yield expression.
+
+```js
+function middleware(f, ...args) {
+  try {
+    g.next(f(...args))
+  } catch (err) {
+    g.throw(err)
+  }
+}
+```
+
+The return value of a generator will be assigned to the yield expression
+
+The resolved value of a Promise will be assigned to the yield expression
+
+### A `cps()` Effect is yielded
+
+For node style (error first) callback
+
+### A `select()` Effect is yielded
+
+Returns state
+
+### A `take()` Effect is yielded
+
+Returns action
+
+### A `fork()` Effect is yielded
+
+The id of the forked task
+
+### A `cancelled()` Effect is yielded
+
+Boolean on whether the task was cancelled or not
+
+### An array of elements is yielded
+
+Elements must be either generator, Effect, Promise or function. Will return array of equal length with return values of each operation
+
+### A generator is yielded
+
+The return value of the generator
+
+### A `race()` Effect is yielded
+
+An object with one value per operation. Only the operation that wins the race will have a value in the returned object.
+
+Interesting pattern:
+
+```js
+yield race({
+  task: call(backgroundTask),
+  cancel: take('CANCEL_TASK')
+})
+```
+
+### A `takeEvery` Effect is yielded
+
+The id of the forked task
+
+## Blocking
+
+### Yielding a function
+
+> If the result is not an Iterator object nor a Promise, the middleware will immediately return that value back to the saga, so that it can resume its execution synchronously.
+
+### Yielding an array
+
+> When we yield an array of effects, the generator is blocked until all the effects are resolved or as soon as one is rejected (just like how `Promise.all` behaves).
+
+
+## Types of values that may be yielded
+
+* Promises - Will block Saga. Promise resolve value will be value of yield expression
+* Effects (POJOs) - Instructions to Saga middleware
+* Arrays - Start parallel tasks. Like forking them all. Will block and return array with returned values from all operations.
+* Generators - Will run generator, and its return value will be value of yield expression
+
+## When are actions supplied to sagas or yielded?
+
+Yielding `take` returns the matched action.
+
+The helper Effects `takeEvery` and `takeLatest` append the matched action to the called function.
