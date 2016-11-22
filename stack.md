@@ -1,3 +1,4 @@
+* super(props) and understanding classes: deep dive again!
 * Explore http://es6-features.org/
 * More ponyfoo articles
 * Atom configuration files

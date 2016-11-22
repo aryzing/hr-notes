@@ -10,6 +10,7 @@ Sagas can yield
 * Object w/ instructions (called Effect)
 * Array. executes sagas in parallel. Elements are must be one of these types.
 * Generator (another saga).
+* Bonus: using `yield*`
 
 # Saga Helpers
 
@@ -138,3 +139,11 @@ The id of the forked task
 Yielding `take` returns the matched action.
 
 The helper Effects `takeEvery` and `takeLatest` append the matched action to the called function.
+
+# Bonus: using `yield*`
+
+https://github.com/yelouafi/redux-saga/issues/318#issuecomment-228790459
+
+# Quirk
+
+`takeEvery` only works with named functions. Deep down in the code it eventually calls `fn.name` and uses that value, so eventually this will produce an error.
