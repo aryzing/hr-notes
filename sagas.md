@@ -7,8 +7,9 @@ source: https://yelouafi.github.io/redux-saga/docs/introduction/BeginnerTutorial
 Sagas can yield
 
 * Promise. will wait for resolution
-* Object w/ instructions
-* Array. executes sagas in parallel. Elements are `saga()` iterators.
+* Object w/ instructions (called Effect)
+* Array. executes sagas in parallel. Elements are must be one of these types.
+* Generator (another saga).
 
 # Saga Helpers
 
@@ -20,10 +21,10 @@ source: https://yelouafi.github.io/redux-saga/docs/basics/UsingSagaHelpers.html
 
 # Most common yield operations
 
-When does yield return a value (.next(value))
-Regular functions do not block
-Types of values that may be yielded
-When are actions supplied to sagas?
+* When does yield return a value (.next(value))?
+* Regular functions do not block
+* Types of values that may be yielded?
+* How/when do redux actions come into play?
 
 ## `yield` return values
 
@@ -79,7 +80,7 @@ Returns state
 
 ### A `take()` Effect is yielded
 
-Returns action
+Returns matched action
 
 ### A `fork()` Effect is yielded
 
@@ -132,7 +133,7 @@ The id of the forked task
 * Arrays - Start parallel tasks. Like forking them all. Will block and return array with returned values from all operations.
 * Generators - Will run generator, and its return value will be value of yield expression
 
-## When are actions supplied to sagas or yielded?
+## How/when do redux actions come into play??
 
 Yielding `take` returns the matched action.
 
