@@ -54,6 +54,32 @@ function* showModalX(header, body) {
 
 # Documentation
 
+## TL;DR Creating a Modal
+
+1. Chose a name for your modal. Examples: "Login", "Warning", "Updates".
+2. Write this name as an exported constant in file `/client/constants/modals.js`
+3. Create a component and/or container for the modal content. This content will be inserted (we'll see how later) inside another component already taking care of basic modal appearance and functionality (gray transparent backdrop, fade-in animation, and full screen) so you don't have to worry about that.
+3. Add your modal component and/or container as a named export **with the same name as the exported name constant** in `/client/components/modals/index.js` and/or `/client/containers/modals/index.js`. [Clarifying Note].
+
+3.not Take a quick look at the imports of file `/client/components/Modal/Modal.jsx`. It imports both the constants where we named our modal, as well as the modals
+
+```js
+import modalComponents from '/src/client/components/modals'
+import modalContainers from '/src/client/containers/modals'
+
+// contains all classes/functions of modal containers/componets
+// assuming containers take precedence over components with same name
+const modals = {...modalComponents, ...modalContainers}
+```
+
+<a name="note"></a>
+**Clarifying note** If your modal only has a comp
+## TL;DR Removing a Modal
+
+1. Remove the modal name from `/client/constants/modals.js`.
+2. Delete the modal's component and/or container directories.
+3. Delete any sagas involving this modal.
+
 The Modal component is desigend to be located somewhere near the root of the document. This is because it By at the top, we mean not deeply nested, or with an ancestor at coords 0,0 to be relative. If none exist, the <html> tag itself will work, but if it's deeply nested and there is an ancestor with its top left corner not at position 0,0, then it not be easy to align.
 
 Why? because it is very hard to make a deeply nested element fill the entire screen: it would require
