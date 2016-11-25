@@ -18,4 +18,5 @@ npm install -g live-server
 live-server --port=3000 --host=localhost
 live-server --port=3000 --host=localhost public
 live-server --port=3000 --host=localhost --no-browser
+live-server --port=3000 --no-browser
 ```
