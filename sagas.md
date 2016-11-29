@@ -147,3 +147,15 @@ https://github.com/yelouafi/redux-saga/issues/318#issuecomment-228790459
 # Quirk
 
 `takeEvery` only works with named functions. Deep down in the code it eventually calls `fn.name` and uses that value, so eventually this will produce an error.
+
+# Yielding "forEach"
+
+From: https://github.com/yelouafi/redux-saga/issues/306#issuecomment-217141546
+
+Use map,
+
+```js
+function* mySaga() {
+  yield [1,2,3].map(x => call(foo, bar));
+}
+```

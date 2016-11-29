@@ -54,29 +54,79 @@ function* showModalX(header, body) {
 
 # Documentation
 
-## TL;DR Creating a Modal
+# Creating a Modal
 
-1. Chose a name for your modal. Examples: "Login", "Warning", "Updates".
-2. Write this name as an exported constant in file `/client/constants/modals.js`
-3. Create a component and/or container for the modal content. This content will be inserted (we'll see how later) inside another component already taking care of basic modal appearance and functionality (gray transparent backdrop, fade-in animation, and full screen) so you don't have to worry about that.
-3. Add your modal component and/or container as a named export **with the same name as the exported name constant** in `/client/components/modals/index.js` and/or `/client/containers/modals/index.js`. [Clarifying Note].
+1. Choose a name for your modal. Examples: "Login", "Warning", "Updates".
 
-3.not Take a quick look at the imports of file `/client/components/Modal/Modal.jsx`. It imports both the constants where we named our modal, as well as the modals
+2. Write this name as an exported constant in [`src/client/constants/modals.js`](src/client/constants/modals.js).
+
+3. Create a component and/or container for your modal. Files related to your component should go into `/src/client/components/modals` and/or `/src/client/containers/modals`. Note that your modal component will be inserted (we'll see how later) inside another component already taking care of basic modal appearance and functionality (gray transparent backdrop, fade-in animation, and full screen). Your modal will be the body of this already provided modal.
+
+3. Create a component and/or container for your modal. Files related to your component should go into `/src/client/components/modals` and/or `/src/client/containers/modals`. Note that your modal will be the child of another component that already takes care of basic modal appearance and functionality (gray transparent backdrop, fade-in animation, and full screen) so you can concentrate on creating the elements unique to your modal.
+
+4. Add a named export **with the same name as the exported name constant** for your modal. If your modal is intended to be used as a **presentational component**, the named export will go in
+ [`/src/client/components/modals/index.js`](/src/client/components/modals/index.js).
+If your modal is intended to be used as a **container component**, add the named export in [`/client/containers/modals/index.js`](/client/containers/modals/index.js).
+
+Thats it! To show and hide modal, dispatch actions with the following signature:
+
+```js
+dispatch({
+  type: 'SHOW_MODAL',
+  payload: {
+    name: '<MODAL_NAME>', // Same name defined in constants file
+    props: '<MODAL_PROPS>' // Data potentially used by modal
+  }
+})
+
+dispatch({
+  type: 'HIDE_MODAL',
+})
+```
+
+The props object, if supplied, will be passed to your modal,
+
+```js
+render() {
+  return (
+    <div>
+      <YourModal {...props}
+    </div>
+  )
+}
+```
+
+# How it works
 
 ```js
 import modalComponents from '/src/client/components/modals'
 import modalContainers from '/src/client/containers/modals'
+import modalNames from '/src/client/constants/modals'
 
 // contains all classes/functions of modal containers/componets
 // assuming containers take precedence over components with same name
 const modals = {...modalComponents, ...modalContainers}
+
+class Modal extends Component {
+  componentDidMount() {
+
+  }
+  componentWillUnmount() {
+
+  }
+  render() {
+    const { name } = this.props
+    const ModalToDisplay = modals[name]
+    return {ModalToDisplay && <ModalToDisplay />}
+  }
+}
 ```
 
-<a name="note"></a>
-**Clarifying note** If your modal only has a comp
-## TL;DR Removing a Modal
+## Removing a Modal
 
 1. Remove the modal name from `/client/constants/modals.js`.
+2. Delete the modal's named exports (if existing) from `src/client/components/modals/index.js`.
+2. Delete the modal's named exports (if existing) from `src/client/containers/modals/index.js`.
 2. Delete the modal's component and/or container directories.
 3. Delete any sagas involving this modal.
 

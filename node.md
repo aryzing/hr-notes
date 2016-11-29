@@ -115,3 +115,9 @@ Also, it seems that within scripts, references to node_module packages that prov
 
 ## Running executables from nearby node_modules
 The
+
+# Scripts
+
+There are some reserved names for scripts. These scripts will run at specific moments:
+
+https://docs.npmjs.com/misc/scripts

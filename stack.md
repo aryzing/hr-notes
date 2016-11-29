@@ -1,3 +1,4 @@
+* Make webpack reboot on erroring out
 * super(props) and understanding classes: deep dive again!
 * Explore http://es6-features.org/
 * More ponyfoo articles
