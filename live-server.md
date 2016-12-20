@@ -20,4 +20,5 @@ live-server --port=3000 --host=localhost public
 live-server --port=3000 --host=localhost --no-browser
 live-server --port=3000 --no-browser
 live-server --port=3000 --ignore=node_modules --no-browser
+live-server --port=6121 --ignore=node_modules --no-browser
 ```
