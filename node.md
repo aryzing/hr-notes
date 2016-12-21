@@ -121,3 +121,7 @@ The
 There are some reserved names for scripts. These scripts will run at specific moments:
 
 https://docs.npmjs.com/misc/scripts
+
+# Package search `require()` rules
+
+https://nodejs.org/api/modules.html#modules_file_modules
