@@ -185,3 +185,18 @@ Understanding triangle like graph topology on github when PR is accepted:
 
 # Hard Reset
 [Post](http://stackoverflow.com/questions/9210446/replace-local-branch-with-remote-branch-entirely).
+
+# Git diff commands
+
+http://stackoverflow.com/questions/4456532/how-can-i-see-what-has-changed-in-a-file-before-committing-to-git
+
+```sh
+# show differences between index and working tree
+# that is, changes you haven't staged to commit
+git diff [filename]
+# show differences between current commit and index
+# that is, what you're about to commit
+git diff --cached [filename]
+# show differences between current commit and working tree
+git diff HEAD [filename]
+```
