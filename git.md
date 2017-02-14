@@ -50,6 +50,8 @@ The following rebase command squashes 3 commits into one. When editor opens (rem
 git rebase -i HEAD~3
 ```
 
+Commits listed from oldest to newest. Can only `fixup` a commit if there is a previous/older one in the list before it.
+
 # Change a remote's name:
 
 Command to change remote URL, can be used for switching from https to ssh:

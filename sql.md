@@ -172,3 +172,11 @@ Select all columns for everyone whose last name ends in "ith".
 ```sql
 select * from employees where last like '%ith';
 ```
+
+# Obtaining data type of a column
+
+```sql
+SELECT DATA_TYPE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'MyTable' AND COLUMN_NAME = 'MyColumn'
+```
