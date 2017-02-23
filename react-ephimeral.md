@@ -2,7 +2,7 @@
 
 The state of a react element is maintained as long as it's class is maintained.
 
-When "re-rendering", a given component maintains it's state if the class that governs its rendering is identical `===` to that in the previous render.
+When "re-rendering", a given component maintains its state if the class that governs its rendering is identical `===` to that in the previous render.
 
 A component only "re-renders" when it's state changes.
 
