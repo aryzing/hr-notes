@@ -96,3 +96,7 @@ Then inside here we use a few React functions to understand the routes being pas
 
 
 # CSS Modules and React
+
+# Images
+
+http://www.davidmeents.com/how-to-set-up-webpack-image-loader/

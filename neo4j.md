@@ -36,3 +36,46 @@ From [Neo4j online training][https://neo4j.com/online_training/graphdatabases/?a
 Built-in tutorial available at `localhost:7474`. Type in command `:play movie graph` to get started.
 
 Note: While going through the tutorial, you may be signed out if you take a lot of time between queries. Simply issue a new `:server connect` command and log back in.
+
+# Quick create a node
+
+Create
+
+```cypher
+create (edu:User {username: 'aryzing', email: 'ebardaji@gmail.com'})
+create (edu)-[:KNOWS]->(js:AUK {name: 'JavaScript', file: 'js.md'})
+create (edu)-[:KNOWS]->(git:AUK {name: 'git', file: 'git.md'})
+create (edu)-[:KNOWS]->(html:AUK {name: 'html', file: 'html.md'})
+
+create (js)-[:DG]->(gClass:Group {name: "Deps for class"})-[:D]->(class:AUK {name: "JS Classes", file: "classes.md"})
+create (gDefer:Group {name: "Group for defer attribute"})
+create (js)-[:DG]->(gDefer)
+create (html)-[:DG]->(gDefer)
+create (defer:AUK {name: "defer attribute", file: "defer.md"})
+create (gDefer)-[:D]->(defer)
+```
+
+Delete everything:
+
+```cypher
+match (n1)-[r]-(n2), (n3)
+delete n1, n2, n3, r
+```
+
+Match everything:
+
+```cypher
+match (n1)-[r]-(n2), (n3)
+return n1, n2, n3, r
+```
+
+Match all connected:
+
+```cypher
+match (n1)-[r]-(n2)
+return n1, n2, r
+```
+
+# Driver
+
+http://neo4j.com/docs/api/javascript-driver/current/
