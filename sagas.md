@@ -1,10 +1,10 @@
 # Sagas
 
-source: https://yelouafi.github.io/redux-saga/docs/introduction/BeginnerTutorial.html
+[Repo][repo] and [Book][book]
 
 # Basic Intro
 
-Sagas can yield
+Sagas are generator functions run by the Sagas middleware for redux. Sagas can yield:
 
 * Promise. will wait for resolution
 * Object w/ instructions (called Effect)
@@ -159,3 +159,7 @@ function* mySaga() {
   yield [1,2,3].map(x => call(foo, bar));
 }
 ```
+
+[repo]: https://github.com/redux-saga/redux-saga
+
+[book]: https://redux-saga.github.io/redux-saga/

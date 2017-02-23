@@ -50,6 +50,8 @@ The following rebase command squashes 3 commits into one. When editor opens (rem
 git rebase -i HEAD~3
 ```
 
+Commits listed from oldest to newest. Can only `fixup` a commit if there is a previous/older one in the list before it.
+
 # Change a remote's name:
 
 Command to change remote URL, can be used for switching from https to ssh:
@@ -184,6 +186,7 @@ Understanding triangle like graph topology on github when PR is accepted:
 * No point in cloning. All objects get pulled down with fetch. Only necessary to `cob` on upstream/master and work away. Push to your repo and PR.
 
 # Hard Reset
+
 [Post](http://stackoverflow.com/questions/9210446/replace-local-branch-with-remote-branch-entirely).
 
 # Staging only parts of file
@@ -226,3 +229,18 @@ This syntax describes an area of changes taking place in a hunk.
 [Patch file stackoverflow](http://stackoverflow.com/questions/1085162)
 
 [Diff syntax stackoverflow](http://stackoverflow.com/questions/4061302)
+
+# Git diff commands
+
+http://stackoverflow.com/questions/4456532/how-can-i-see-what-has-changed-in-a-file-before-committing-to-git
+
+```sh
+# show differences between index and working tree
+# that is, changes you haven't staged to commit
+git diff [filename]
+# show differences between current commit and index
+# that is, what you're about to commit
+git diff --cached [filename]
+# show differences between current commit and working tree
+git diff HEAD [filename]
+```
