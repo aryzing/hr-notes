@@ -200,3 +200,9 @@ git diff --cached [filename]
 # show differences between current commit and working tree
 git diff HEAD [filename]
 ```
+
+# Pushing everything
+
+```sh
+git push --all
+```
