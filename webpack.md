@@ -97,6 +97,10 @@ Then inside here we use a few React functions to understand the routes being pas
 
 # CSS Modules and React
 
+# Images
+
+http://www.davidmeents.com/how-to-set-up-webpack-image-loader/
+
 # Multiple entry points and backend webpack
 
 https://leanpub.com/setting-up-es6/read#sec_nodejs-babel-static

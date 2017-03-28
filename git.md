@@ -1,6 +1,6 @@
 # Creating repo on github to repo already existing on laptop
 
-After creation,
+First use GitHub web to create empty repo. After creation,
 
 ```
 git remote add origin <ssl or https location>
@@ -49,6 +49,8 @@ The following rebase command squashes 3 commits into one. When editor opens (rem
 ```
 git rebase -i HEAD~3
 ```
+
+Commits listed from oldest to newest. Can only `fixup` a commit if there is a previous/older one in the list before it.
 
 # Change a remote's name:
 
@@ -184,7 +186,49 @@ Understanding triangle like graph topology on github when PR is accepted:
 * No point in cloning. All objects get pulled down with fetch. Only necessary to `cob` on upstream/master and work away. Push to your repo and PR.
 
 # Hard Reset
+
 [Post](http://stackoverflow.com/questions/9210446/replace-local-branch-with-remote-branch-entirely).
+
+# Staging only parts of file
+
+To stage only part of a file to commit, use the patch option
+
+```
+git add -p [filename]
+```
+
+Available actions during the patch process include
+
+* `y` stage this hunk for the next commit
+* `n` do not stage this hunk for the next commit
+* `q` quit; do not stage this hunk or any of the remaining hunks
+* `a` stage this hunk and all later hunks in the file
+* `d` do not stage this hunk or any of the later hunks in the file
+* `g` select a hunk to go to
+* `/` search for a hunk matching the given regex
+* `j` leave this hunk undecided, see next undecided hunk
+* `J` leave this hunk undecided, see next hunk
+* `k` leave this hunk undecided, see previous undecided hunk
+* `K` leave this hunk undecided, see previous hunk
+* `s` split the current hunk into smaller hunks
+* `e` manually edit the current hunk
+* `?` print hunk help
+
+Note that during a manual edit, the diff file will contain lines similiar to
+
+```
+@@ -20,4 +20,7 @@
+```
+
+This syntax describes an area of changes taking place in a hunk.
+
+```
+@@ -[start_line],[number_lines_removed] +[start_line],[number_lines_added] @@
+```
+
+[Patch file stackoverflow](http://stackoverflow.com/questions/1085162)
+
+[Diff syntax stackoverflow](http://stackoverflow.com/questions/4061302)
 
 # Git diff commands
 
@@ -206,3 +250,11 @@ git diff HEAD [filename]
 ```sh
 git push --all
 ```
+
+# Having per-repo specific git settings
+
+Custom settings for a repo go in `.git/config`
+
+> The .git/config file in a particular clone of a repository is local to that clone. Any settings placed there will only affect actions for that particular project.
+
+http://stackoverflow.com/questions/8801729/is-it-possible-to-have-different-git-config-for-different-projects
