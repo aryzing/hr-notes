@@ -1,5 +1,27 @@
 # Auth
 
+# List of resources
+
+[RFC6749 The OAuth 2.0 Authorization Framework][https://tools.ietf.org/html/rfc6749]
+
+[RFC6750 The OAuth 2.0 Authorization Framework: Bearer Token Usage][https://tools.ietf.org/html/rfc6750]
+
+[RFC7515 JSON Web Signature (JWS)][https://tools.ietf.org/html/rfc7515]
+
+[RFC7516 JSON Web Encryption (JWE)][https://tools.ietf.org/html/rfc7516]
+
+[RFC7519 JSON Web Token (JWT)][https://tools.ietf.org/html/rfc7519]
+
+[RFC7523 JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants][https://tools.ietf.org/html/rfc7523]
+
+[OAuth 2.0 Multiple Response Type Encoding Practices][http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html]
+
+[OpenID Connect Core 1.0 incorporating errata set 1][http://openid.net/specs/openid-connect-core-1_0.html]
+
+[OpenID Connect Basic Client Implementer's Guide 1.0 - draft 37][http://openid.net/specs/openid-connect-basic-1_0.html]
+
+
+
 # RFC 6749 notes
 
 Out of scope.
