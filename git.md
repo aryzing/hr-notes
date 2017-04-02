@@ -244,3 +244,17 @@ git diff --cached [filename]
 # show differences between current commit and working tree
 git diff HEAD [filename]
 ```
+
+# Pushing everything
+
+```sh
+git push --all
+```
+
+# Having per-repo specific git settings
+
+Custom settings for a repo go in `.git/config`
+
+> The .git/config file in a particular clone of a repository is local to that clone. Any settings placed there will only affect actions for that particular project.
+
+http://stackoverflow.com/questions/8801729/is-it-possible-to-have-different-git-config-for-different-projects
