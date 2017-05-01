@@ -20,6 +20,10 @@
 
 [OpenID Connect Basic Client Implementer's Guide 1.0 - draft 37][http://openid.net/specs/openid-connect-basic-1_0.html]
 
+[Nordic][http://nordicapis.com/how-to-control-user-identity-within-microservices/]
+
+[Deutsche Telekom][http://www.gsma.com/personaldata/wp-content/uploads/2014/03/OpenID-Connect-at-Deutsche-Telekom-Torsten-Lodderstedt.pdf]
+
 
 
 # RFC 6749 notes
@@ -163,3 +167,9 @@ Out of scope: who was token issued to?
 > This specification does not provide any methods for the resource
 server to ensure that an access token presented to it by a given
 client was issued to that client by the authorization server.
+
+# OpenID Connect notes
+
+Out of scope: process of Authentication
+
+> The methods used by the Authorization Server to Authenticate the End-User (e.g. username and password, session cookies, etc.) are beyond the scope of this specification.
