@@ -12,3 +12,5 @@ This means that this text's appearance won't be consistent since it depends on t
 [W3C font weight](https://www.w3.org/TR/css-fonts-3/#font-weight-prop)
 
 [MDN font weight](https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight)
+
+[CSS Tricks font weight](https://css-tricks.com/almanac/properties/f/font-weight/)
