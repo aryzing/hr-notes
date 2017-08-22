@@ -1,5 +1,45 @@
 # Webpack
 
+# Hot Module Replacement
+
+From application point of view: app asks HMR runtime, HMR downloads updates and notifies app, app asks HMR to apply updates.
+
+Can set up automatic updates, or updates that require user interaction.
+
+Compiler emits assets + "update". The update = updated manifest + updated chunks.
+
+QUESTION: "The compiler ensures that module IDs and chunk IDs are consistent between these builds". What's this all about? What if the IDs are not consistent? What does that mean? What happens then? Is it possible? What could cause this?
+
+HMR is opt-in.
+
+Loaders can cause a module to opt-in by default. For example, `style-loader` makes modules it processes opt into HMR when HMR has been activated.
+
+You make a module opt in by simply using the HMR API.
+
+Modules that change that have not opted in cause the update to bubble up the dependency tree. When handled, the entire set of dependencies of that tree are reloaded.
+
+IDEA: Yes, this is all very abstract. No specifics yet, but for now will have to suffice.
+
+QUESTION: The "module system runtime", isn't this the *webpack runtime*?
+
+When HMR is active, additional code is emitted (aka produced/generated) to track all modules' parents and children.
+
+That is, `parents` and `children`.
+
+IDEA: These may be variables that can be accesed from the module object, like `module.parents`.
+
+The runtime supports `check` and `apply`
+
+`check` checks for updates, downloads any available, switches runtime to `ready` state.
+
+Calling `apply` invalidtes updated modules [modules or chunks?]. Invalidation bubbles up to parents until update handler encountered. If it bubbles beyond the entry point, the process fails.
+
+Invalid modules are then discarded, the `accept` handlers are called, and the runtime switches back to `idle`.
+
+`webpack-dev-server` supports HMR and tries to update with HMR before reloading the whole page.
+
+IDEA: Perhapse if the HMR fails, for example because it bubbles beyond the entry point, the dev server reloads the page.
+
 # Why don't we want the modules to run on code that is not ours?
 
 ```
@@ -33,7 +73,7 @@ Then, how does `import styles from './app.css'` this work? This line is present 
 * creates the necessary JS to embed those unique class names into the page
 * creates the necessary JS to include those unique class names in a commonJS exportable object that can be used in the requiring module.
 
-NOTE: css-loader creates the JS for the .css file and style-loader creats the JS to add the css inline within a <style> html tag.
+NOTE: css-loader creates the JS for the .css file and style-loader creates the JS to add the css inline within a <style> html tag.
 
 I think the style loader goes one step further and makes the class names available as non-modified unique string names, or maybe its the other way around. who knows, let me inspect.
 
