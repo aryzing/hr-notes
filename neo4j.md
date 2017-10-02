@@ -79,3 +79,17 @@ return n1, n2, r
 # Driver
 
 http://neo4j.com/docs/api/javascript-driver/current/
+
+# Getting neo to work again
+
+1. Uncommented `#NEO4J_ULIMIT_NOFILE=40000` line in `/etc/default/neo4j`. I was pretty sure I did this, but perhaps it got commented out after I upgraded/reinstalled. Anyways, although neo4j was complaining about something related to this limit, after re-installing, it was all about updating the database.
+2. Purge and reinstall
+3. Allow neo4j to perform automatic DB format migrations with `sudo sed -i 's/#dbms.allow_format_migration=true/dbms.allow_format_migration=true/' /etc/neo4j/neo4j.conf`
+
+A few useful commands:
+
+```sh
+journalctl -e -u neo4j > neolog.txt # write neo4j logs to file
+systemctl start neo4j # start neo4j. It appears that it is no longer auto-starting
+systemctl cat neo4j # view info on the neo4j service.
+```
