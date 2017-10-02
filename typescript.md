@@ -103,9 +103,9 @@ Note,  I don't care about this result, because this only matters when using the 
 Still to come:
 
 * [done] Adding babel
-* Adding react and hmr
-  * babel-react
-  * webpack dev server
+* [done] Adding react and hmr
+  * [done] babel-react
+  * [done] webpack dev server
 
 # TODAY
 
@@ -142,3 +142,10 @@ Have not downloaded any type definitions, and seems to work ok
 Chose to have babel do all the transpiling, so I set `jsx: Preserve` in `tsconfig.json`.
 
 I changed the index file extension to `.tsx` and it got picked up correctly by TypeScript. Need this extension for files using tsx or TypeScript will not understand the tsx syntax.
+
+Also, although not necessary because it's the default, we're telling typescript not to transpile the JSX
+
+```json
+{
+  "jsx": "Preserve"
+}
