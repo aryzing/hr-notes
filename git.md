@@ -258,3 +258,22 @@ Custom settings for a repo go in `.git/config`
 > The .git/config file in a particular clone of a repository is local to that clone. Any settings placed there will only affect actions for that particular project.
 
 http://stackoverflow.com/questions/8801729/is-it-possible-to-have-different-git-config-for-different-projects
+
+# Case sensitivity
+
+By default, git is **not** case sensitive when it comes to file names. To make it case sensitive,
+
+```sh
+git config core.ignorecase false
+```
+
+or alternatively add it in a config file as
+
+```
+[core]
+  ignorecase = false
+```
+
+[docs](https://git-scm.com/docs/git-config#git-config-coreignoreCase)
+
+[SO post ](https://stackoverflow.com/questions/17683458/how-do-i-commit-case-sensitive-only-filename-changes-in-git)
