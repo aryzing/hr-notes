@@ -35,13 +35,13 @@ Future: Decentralized hardware and software.
 
 **Distributed ledger**: Data structure residing across multiple devices.
 
-**Distributed Ledger Technology**: Group of technologies that make a distributed ledger technologically bound, and which contribute in giving the ledger its properties. Examples: timestamping transactions, peer-to-peer networks, cryptography, shared computational power, consensus algorithm.
+**Distributed Ledger Technology**: Group of technologies that make up a distributed ledger, and which contribute in giving the ledger its properties. Examples: timestamping transactions, peer-to-peer networks, cryptography, shared computational power, consensus algorithm.
 
 In general, modern distributed ledger technology includes
 
 * A *data model* representing current state of the ledger
 * A *language of transactions* for changing the ledger state
-* A *consensus protocol* to determine how to interpret the data model and perform modifications on it.
+* A *consensus protocol* to determine how to interpret the data model (i.e., which transactions are considered accepted and the order in which they ocurred).
 
 **Blockchain**: A blockchain is a peer-to-peer distributed ledger forged by consensus, combined with a system for "smart contracts" and other assistive technologies.
 
@@ -74,7 +74,7 @@ Andreas M. Antonopoulos (of Bitcoin protocol):
 
 > Merkle trees are used to summarize all the transactions in a block, producing an overall digital fingerprint of the entire set of transactions, providing a very efficient process to verify whether a transaction is included in a block.
 
-![Bitcoin block data](images/ch01-bitcoin-block-data.png)
+![Bitcoin block data](./images/ch01-bitcoin-block-data.png)
 
 Blockchain describes what has happened in the past, it's a logging system. It is not a platform for business decisions, although business decisions may rely on a blockchain as a source of input.
 
@@ -94,7 +94,7 @@ Should be driven by the particular application or use case.
 
 Data on a blockchain can be considered immutable: extremely hard and prohibitively expensive (literally lots of energy/money) to change the past.
 
-![Bitcoin immutability](images/ch01-immutability.png)
+![Bitcoin immutability](./images/ch01-immutability.png)
 
 Vitalik Buterin:
 
@@ -113,3 +113,88 @@ Ethereum provides Ether and Turing-complete virtual machine.
 **Simplified Byzantine Fault Tolerance (SBFT)**: Version of Practical Byzantine Fault Tolerance (PBFT). Validator is known party (permissioned ledger). Other nodes must ratify result. There must be at least `2f+1` nodes ratifying a result in a network with `3f+1` nodes where `f` is the number of faults in order for the system to be Byzantine fault tolerant. **Permissioned**.
 
 **Proof of Authority**: A group of nodes are considered authorities, and only they can create new blocks. They are also the only ones that can reach consensus.
+
+Hyperledger blockchains are generally permissioned: parties that join the network must be authenticated and authorized.
+
+Hyperledger is a community of communities sharing with each other, projects are multi-stakeholder to ensure projects outlast any one company's commitment to them.
+
+# Chapter 2. Introduction to Hyperledger
+
+## Hyperledger
+
+Hyperledger is an open source effort created to advance cross-industry blockchain technologies.
+
+Hyperledger blockchains are **permissioned blockchains**.
+
+Hyperledger projects operate using **open governance** consisting of group of **core maintainers** (contribute code, documentation, decide on roadmap) and a **Technical Steering Commitee** elected by all contributors (not just maintainers). The TSC ensures the project is healthy and growing.
+
+## Hyperledger Frameworks
+
+New projects come in through the incubator.
+
+Hyperledger frameworks include
+* ledger, append only and distributed
+* consensus algorithm,
+* privacy through premissioned access
+* smart contracts to process transaction requests
+
+**Hyperledger Iroha**: simple and easy. For mobile application development. C++. YAC.
+
+**Hyperledger Sawtooth**: Intel. Various consensus algs available, PoET by default. Permissioned and permissionless. Designed to grow. Can change consensus mechanism on the fly.
+
+Consensus mechanism PoET
+
+Transaction families (templates for smart contracts)
+
+**Hyperledger Fabric**: Consensus and membership services can be plug and play. Confidential transactions without central authority. Different jobs for different node types w/i network. Permissioned. Can create private channels b/w parties.
+
+Ordering service for seperate set of nodes.
+
+Subsets of exchanges using private channels.
+
+**Hyperledger Indy**: Focused on distributed identity. Can interact with other DLTs that support Indy's API. Users own their identity. No need for companies to store it.
+
+**Hyperledger Burrow**: Only Apache-licensed Ethereum Virtual Machine. Components include Gateway (systems and user interface), Smart contract application engine, Consensus engine (maintain network stack and transaction order), Application Blockchain Interface (interface b/w consensus engine and smart contracts).
+
+## Hyperleder Modules
+
+**Hyperledger Cello**: BaaS.
+
+**Hyperledger Explorer**: Blockchain visualizer for permissioned blockchains.
+
+**Hyperledger Composer**: Tools for building blockchain business networks. JavaScript.
+
+## From Q/A with Brian Behlendorf
+
+Different architectural layers from hyperledger
+
+* DLT
+* Smart Contract
+* Identity
+
+# Chapter 3. The Promise of Business Blockchain Technologies
+
+Philosophical.
+
+Trust?
+
+Physical to virtual representation?
+
+Advertizing?
+
+Following a fish
+
+* Who categorized the fish?
+* transactions put inot the system may not represent the product in real life
+* the product may change in real life and no one bothers to update
+* The updating mechanisms may be hacked?
+
+Supply chain management
+
+* Making physical products have online identities (palet of nuts and bolts)
+* Must decide on how the objects are tracked
+* Good for Audit Trail only?
+* How strong is the physical identity tied to the digital identity of a product
+* Interpretation?
+* Enforceability?
+* Example: A photo: Comparing one to another 1px different => fake. But npx different: fake or different photo? What about photos taken from different cameras about the same subject?
