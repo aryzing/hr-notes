@@ -185,7 +185,7 @@ Advertizing?
 Following a fish
 
 * Who categorized the fish?
-* transactions put inot the system may not represent the product in real life
+* transactions put into the system may not represent the product in real life
 * the product may change in real life and no one bothers to update
 * The updating mechanisms may be hacked?
 
@@ -198,3 +198,71 @@ Supply chain management
 * Interpretation?
 * Enforceability?
 * Example: A photo: Comparing one to another 1px different => fake. But npx different: fake or different photo? What about photos taken from different cameras about the same subject?
+* Would all camera manufacturers have to agree on implementing a standard for this?
+
+Blockchain is a tool, and like all others, businesses must decide if adopting it helps them solve a business need.
+
+When to use blockchain:
+
+* Need for shared common database
+* Conflicting incentives or low trust b/w participants
+* Multiple parties writing data
+* Existing middleman or escrow services exist in the domain
+* Cryptography is currently being used (or should be used) in the domain
+* Uniform rules for participants
+* Parties' decisions are transparent
+* Need for single source of truth
+* Under 10k tx/s
+
+When not to use blockchain:
+
+* Confidential data
+* Lots of static data or large data
+* Transaction rules change frequently
+* Need to interact with external services
+
+![When to adopt blockchain](./images/ch03-adopting-blockchain-decision.png)
+
+# Hyperledger Iroha
+
+YAC or Samuragi?
+
+![Iroha architecture](./images/ch05-iroha-architecture.png)
+
+Three main participants: clients, peers, ordering service
+
+Clients can query and create **transactions**. Transactions consists of one or more **commands**.
+
+Peers maintain current state and have copy of data. A peer is single entity in the network: address, identity, trust.
+
+Ordering service, kafka recommended
+
+What's the difference b/w client and peer?
+
+Steps:
+
+1. **client** sends **transaction** to **Torii** of a **peer**. The peer performs **stateless validation**.
+2. The peer then submits the tx via the **Ordering Gate** to the **Ordering Service**.
+3. Ordering service puts transactions in order into a **Proposal** block, which is sent to all peers. Proposal blocks are **unsigned**.
+4. Peers perform **stateful validation** in the **Simulator** to create a **signed block**. Block is sent to **Consensus Gate** to perform **YAC** logic.
+5. Using YAC, peers ordered **?** and **Leader** elected. **Votes** are cast to leader.
+6. After voting passes by 2/3, a **commit message** is sent to peers. Proposed block becomes "the next block" of every peer via the **synchronizer**.
+
+YAC (Yet Another Consensus): algorithm for ordering and consensus.
+
+Ordering service is single point of failure. Not crash fault-tolerant or byzantine fault-tolerant.
+
+Steps of YAC
+
+1. **Ordering Service** share a **proposal**: unsigned block of ordered transactions
+2. **Peers** calculate hash and sign it. The tuple `<Hash, Signature>` is their **vote**.
+3. Each peer creates an ordered list of peers based on the hash. The first peer on the list is the **leader**.
+4. The leader counts the votes and emits a **commit** message.
+5. Peers verify the commit and add the block to the ledger.
+
+Correcting failures:
+
+* Broken leader: leader acts unfairly or takes too long: next peer is chosen as leader.
+* Bad transactions from ordering service: A proposal block may contain "bad" transactinos (only peers verify them). If a proposal block contains "bad" transactions, a peer will remove them and send the block back for evaluation.
+
+# Ch. 6. Hyperledger Sawtooth
