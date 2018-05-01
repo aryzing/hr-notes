@@ -1,5 +1,6 @@
 import Cookies from "js-cookie";
 import qs from 'query-string';
+// import identityServiceUrlGenerator
 
 const depositsOrigin = `${}://${}:${}`
 const zopaDepositsOpZopaSessionState = Cookies.get('zopa-deposits-OP-zopa-session-state')
@@ -53,19 +54,21 @@ const handlePostMessage = (event) => {
   if (event.data === 'changed') {
     // redirect to OP
     const state = {
-      attempt: 1,
+      // attempt: 1,
       session: Cookies.get('zopa-deposits-session'),
     }
     const stateBase64UrlEncoded = btoa(JSON.stringify(state));
 
+    // TODO: use identityServiceUrlGenerator here
     const query = qs.stringify({
       prompt: 'none',
       state: stateBase64UrlEncoded,
-      redirect_uri: depositsOrigin,
+      redirect_uri: depositsRpIframe,
       id_token_hint: Cookies.get('zopa-deposits-id-token'),
     });
 
     window.location.replace(`${process.env.IDENTITY_SERVER}?${query}`)
+
   } else if (event.data === 'error') {
     console.warn('Received postMessage error from OP iframe.');
   } else if (event.data === 'unchanged') {
